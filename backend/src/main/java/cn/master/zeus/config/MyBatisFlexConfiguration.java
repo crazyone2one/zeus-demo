@@ -5,6 +5,7 @@ import com.mybatisflex.core.FlexGlobalConfig;
 import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.audit.ConsoleMessageCollector;
 import com.mybatisflex.core.audit.MessageCollector;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import com.mybatisflex.core.mybatis.FlexConfiguration;
 import com.mybatisflex.spring.boot.ConfigurationCustomizer;
 import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
@@ -21,11 +22,12 @@ public class MyBatisFlexConfiguration implements MyBatisFlexCustomizer, Configur
     @Override
     public void customize(FlexGlobalConfig globalConfig) {
         FlexGlobalConfig.KeyConfig keyConfig = new FlexGlobalConfig.KeyConfig();
-        keyConfig.setKeyType(KeyType.Sequence);
-        keyConfig.setValue("select SEQ_USER_ID.nextval as id from dual");
-        //  keyConfig.setValue(KeyGenerators.flexId);
+        keyConfig.setKeyType(KeyType.Generator);
+        keyConfig.setValue(KeyGenerators.flexId);
         keyConfig.setBefore(true);
-        globalConfig.setKeyConfig(keyConfig);
+        FlexGlobalConfig.getDefaultConfig().setKeyConfig(keyConfig);
+        //全局配置逻辑删除字段
+        FlexGlobalConfig.getDefaultConfig().setLogicDeleteColumn("del_flag");
     }
 
     @Override

@@ -1,9 +1,21 @@
 server:
   port: 8888
 spring:
+  # Database configuration props
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://127.0.0.1:3306/zeus?characterEncoding=UTF-8&useInformationSchema=true
     username: root
     password: admin
+#  JWT Configuration
+security:
+  jwt:
+    secret-key: U2FsdGVkX18epMj+KK0TtMyZJzvr45zahWHKpl4+kSg=
+    accessToken:
+      expiration: 86400000 # a day=>86400000 1min=>60000
+    refreshToken:
+      expiration: 604800000 # 7 days
+mybatis-flex:
+  global-config:
+    print-banner: false
