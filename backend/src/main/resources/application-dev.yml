@@ -19,3 +19,6 @@ security:
 mybatis-flex:
   global-config:
     print-banner: false
+rsa:
+  private-key: classpath:certs/private-key.pem
+  public-key: classpath:certs/public-key.pem
