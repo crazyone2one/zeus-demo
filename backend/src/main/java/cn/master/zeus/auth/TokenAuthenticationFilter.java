@@ -1,9 +1,8 @@
 package cn.master.zeus.auth;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.MissingClaimException;
+import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.error.ApiError;
+import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -53,7 +53,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 authorities = (String) body.get("authorities");
             }
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = new HashSet<>();
-
             Arrays.asList(authorities.split(" "))
                     .forEach(a -> simpleGrantedAuthorities.add(new SimpleGrantedAuthority(a)));
             Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -64,7 +63,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             log.info("authenticated user with email :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (ExpiredJwtException e) {
-            throw new JwtException("Token is expired");
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Token expiration");
+        } catch (UnsupportedJwtException exception) {
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Token's not supported");
+        } catch (MalformedJwtException exception) {
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid format 3 part of token");
+        } catch (SecurityException exception) {
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid format token");
         } catch (JwtException e) {
             throw new JwtException(e.getMessage());
         }

@@ -32,6 +32,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             if (e instanceof JwtException) {
                 status = HttpStatus.UNAUTHORIZED.value();
             }
+            apiError.setCode(status);
             response.setStatus(status);
             response.getWriter().write(convertObjectToJson(apiError));
         }
