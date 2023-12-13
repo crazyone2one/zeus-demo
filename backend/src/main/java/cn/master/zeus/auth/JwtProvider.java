@@ -4,13 +4,15 @@ import cn.master.zeus.dto.CustomUserDetails;
 import cn.master.zeus.entity.SystemToken;
 import com.mybatisflex.core.query.QueryChain;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,24 +54,35 @@ public class JwtProvider {
         if (Objects.isNull(systemToken)) {
             throw new JwtException("Invalid token");
         }
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
-    private String buildJwtToken(Map<String, Object> body, long expiration) {
-
+    /**
+     * 生成token
+     *
+     * @param claims     claims
+     * @param expiration token过期时间
+     * @return java.lang.String
+     */
+    private String buildJwtToken(Map<String, Object> claims, long expiration) {
         Date tokenCreateTime = new Date(System.currentTimeMillis());
         Date tokenValidity = new Date(tokenCreateTime.getTime() + expiration);
         try {
             return Jwts.builder()
-                    .addClaims(body)
+                    .setClaims(claims)
                     .setIssuer("zeus")
-                    .setSubject((String) body.get("username"))
+                    .setSubject((String) claims.get("username"))
                     .setIssuedAt(tokenCreateTime)
                     .setExpiration(tokenValidity)
-                    .signWith(SignatureAlgorithm.HS256, secretKey)
+                    .signWith(getSignKey(), SignatureAlgorithm.HS256)
                     .compact();
         } catch (JwtException e) {
             throw new JwtException(e.getMessage());
         }
+    }
+
+    private Key getSignKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
