@@ -1,6 +1,7 @@
 package cn.master.zeus.service;
 
 import cn.master.zeus.dto.request.AuthenticationRequest;
+import cn.master.zeus.dto.request.RefreshTokenRequest;
 import cn.master.zeus.dto.response.AuthenticationResponse;
 
 /**
@@ -13,5 +14,9 @@ public interface AuthenticationService {
      * @return cn.master.zeus.dto.response.AuthenticationResponse
      */
     AuthenticationResponse login(AuthenticationRequest request);
+
+    void logout(String userName);
+
+    AuthenticationResponse refreshToken(RefreshTokenRequest request);
 }
 

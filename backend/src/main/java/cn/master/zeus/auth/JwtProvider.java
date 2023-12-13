@@ -7,6 +7,7 @@ import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +31,8 @@ public class JwtProvider {
     private long refreshExpiration;
 
     public String generateAccessToken(CustomUserDetails userDetails) {
-        List<SimpleGrantedAuthority> userDetailsAuthorities = (List<SimpleGrantedAuthority>) userDetails.getAuthorities();
-        String authorities = userDetailsAuthorities.stream().map(SimpleGrantedAuthority::getAuthority)
+        Collection<? extends GrantedAuthority> userDetailsAuthorities = userDetails.getAuthorities();
+        String authorities = userDetailsAuthorities.stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
         Map<String, Object> tokenBody = new LinkedHashMap<>();
         tokenBody.put("username", userDetails.getUsername());

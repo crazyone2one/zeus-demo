@@ -4,14 +4,17 @@ import cn.master.zeus.auth.JwtProvider;
 import cn.master.zeus.common.enums.TokenType;
 import cn.master.zeus.dto.CustomUserDetails;
 import cn.master.zeus.dto.request.AuthenticationRequest;
+import cn.master.zeus.dto.request.RefreshTokenRequest;
 import cn.master.zeus.dto.response.AuthenticationResponse;
 import cn.master.zeus.entity.SystemToken;
 import cn.master.zeus.entity.SystemUser;
 import cn.master.zeus.mapper.SystemTokenMapper;
 import cn.master.zeus.service.AuthenticationService;
 import com.mybatisflex.core.query.QueryChain;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,18 +44,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse login(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(authentication.getName())).one();
-        val userDetails = new CustomUserDetails(user);
-        val accessToken = jwtProvider.generateAccessToken(userDetails);
-        val refreshToken = jwtProvider.generateRefreshToken(userDetails);
-        revokeUserToken(user, Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
-        saveUserToken(user, accessToken, TokenType.ACCESS_TOKEN.name());
-        saveUserToken(user, refreshToken, TokenType.REFRESH_TOKEN.name());
+        val principal = (CustomUserDetails)authentication.getPrincipal();
+        val accessToken = jwtProvider.generateAccessToken( principal);
+        val refreshToken = jwtProvider.generateRefreshToken( principal);
+        revokeUserToken(principal.getSystemUser(), Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
+        saveUserToken(principal.getSystemUser(), accessToken, TokenType.ACCESS_TOKEN.name());
+        saveUserToken(principal.getSystemUser(), refreshToken, TokenType.REFRESH_TOKEN.name());
         return AuthenticationResponse.builder()
                 .accessToken(accessToken).refreshToken(refreshToken)
                 .tokenType("bearer")
                 .expiresIn(jwtExpiration)
                 .build();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logout(String userName) {
+        val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(userName)).one();
+        revokeUserToken(user, Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
+    }
+
+    @Override
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+        val claimsJws = jwtProvider.validateToken(refreshToken);
+        Claims body = claimsJws.getBody();
+        val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(body.get("username"))).one();
+        return null;
     }
 
     protected void saveUserToken(SystemUser user, String token, String tokenType) {
@@ -64,12 +82,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenTypes.forEach(tt -> {
             val systemToken = QueryChain.of(SystemToken.class).where(
                     SYSTEM_TOKEN.USER_ID.eq(user.getId())
-                            .and(SYSTEM_TOKEN.TOKEN.eq(tt.name()))
+                            .and(SYSTEM_TOKEN.TOKEN_TYPE.eq(tt.name()))
                             .and(SYSTEM_TOKEN.REVOKED.eq(false))
-            ).one();
-            if (systemToken != null) {
-                systemToken.setRevoked(true);
-                tokenMapper.update(systemToken);
+            ).list();
+            if (CollectionUtils.isNotEmpty(systemToken)) {
+                systemToken.forEach(st -> {
+                    st.setRevoked(true);
+                    tokenMapper.update(st);
+                });
             }
         });
     }

@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * @author Created by 11's papa on 12/10/2023
  **/
-@Component
+
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     final HttpMessageConverter<String> messageConverter;

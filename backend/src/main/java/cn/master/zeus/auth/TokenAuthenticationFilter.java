@@ -31,7 +31,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class TokenAuthenticationFilter extends OncePerRequestFilter {
     final JwtProvider jwtProvider;
 
     @Override
