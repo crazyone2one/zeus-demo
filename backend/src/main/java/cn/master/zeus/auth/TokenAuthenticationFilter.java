@@ -1,7 +1,6 @@
 package cn.master.zeus.auth;
 
 import cn.master.zeus.common.exception.ServiceException;
-import cn.master.zeus.error.ApiError;
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -60,14 +59,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     null,
                     simpleGrantedAuthorities
             );
-            log.info("authenticated user with email :{}", username);
+            log.info("authenticated user with email/username :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (ExpiredJwtException e) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Token expiration");
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Expired JWT token");
         } catch (UnsupportedJwtException exception) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Token's not supported");
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Unsupported JWT token");
         } catch (MalformedJwtException exception) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid format 3 part of token");
+            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
         } catch (SecurityException exception) {
             throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid format token");
         } catch (JwtException e) {

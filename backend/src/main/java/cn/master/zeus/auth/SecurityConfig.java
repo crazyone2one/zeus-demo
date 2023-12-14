@@ -46,6 +46,10 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+        //.exceptionHandling(exceptionHandling ->
+        //        exceptionHandling.authenticationEntryPoint((request, response, authException) ->
+        //                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+        //                        authException.getLocalizedMessage())))
         ;
         return http.build();
     }
