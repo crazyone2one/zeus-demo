@@ -1,10 +1,35 @@
 <script setup lang="ts">
-import { NConfigProvider } from 'naive-ui'
+import {
+  NConfigProvider,
+  NGlobalStyle,
+  NLoadingBarProvider,
+  NDialogProvider,
+  NMessageProvider,
+  NNotificationProvider,
+  useOsTheme,
+  darkTheme,
+  zhCN,
+  dateZhCN,
+} from 'naive-ui'
+import BaseView from '/@/layout/components/BaseView.vue'
+import { computed } from 'vue'
+const osTheme = useOsTheme()
+const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
 </script>
 
 <template>
-  <n-config-provider>
-    <router-view />
+  <n-config-provider :theme="theme" :locale="zhCN" :date-locale="dateZhCN">
+    <n-global-style />
+    <n-loading-bar-provider>
+      <n-dialog-provider>
+        <n-notification-provider>
+          <n-message-provider>
+            <base-view />
+            <slot />
+          </n-message-provider>
+        </n-notification-provider>
+      </n-dialog-provider>
+    </n-loading-bar-provider>
   </n-config-provider>
 </template>
 

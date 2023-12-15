@@ -7,7 +7,10 @@ import naive from './plugins/naive'
 import 'vfonts/Lato.css'
 // 等宽字体
 // import 'vfonts/FiraCode.css'
+
+import pinia from './store'
 const app = createApp(App)
 app.use(router)
 app.use(naive)
+app.use(pinia)
 app.mount('#app')

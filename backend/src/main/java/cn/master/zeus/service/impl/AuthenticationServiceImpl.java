@@ -44,9 +44,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse login(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        val principal = (CustomUserDetails)authentication.getPrincipal();
-        val accessToken = jwtProvider.generateAccessToken( principal);
-        val refreshToken = jwtProvider.generateRefreshToken( principal);
+        val principal = (CustomUserDetails) authentication.getPrincipal();
+        val accessToken = jwtProvider.generateAccessToken(principal);
+        val refreshToken = jwtProvider.generateRefreshToken(principal);
         revokeUserToken(principal.getSystemUser(), Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
         saveUserToken(principal.getSystemUser(), accessToken, TokenType.ACCESS_TOKEN.name());
         saveUserToken(principal.getSystemUser(), refreshToken, TokenType.REFRESH_TOKEN.name());
@@ -54,6 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(accessToken).refreshToken(refreshToken)
                 .tokenType("bearer")
                 .expiresIn(jwtExpiration)
+                .userId(principal.getSystemUser().getId())
                 .build();
     }
 

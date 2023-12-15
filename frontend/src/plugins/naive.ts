@@ -9,6 +9,7 @@ import {
   NDropdown,
   NForm,
   NFormItem,
+  NFormItemRow,
   NIcon,
   NInput,
   NPopover,
@@ -18,6 +19,8 @@ import {
   NSpin,
   NSwitch,
   NTooltip,
+  NResult,
+  NCard,
 } from 'naive-ui'
 
 const naive = create({
@@ -38,6 +41,9 @@ const naive = create({
     NSkeleton,
     NSpin,
     NPopover,
+    NResult,
+    NFormItemRow,
+    NCard,
   ],
 })
 
