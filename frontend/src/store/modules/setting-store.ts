@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 export const useSettingStore = defineStore('settings', {
   state: () => {
     return {
-      isCollapsed: false,
+      isCollapsed: true,
       language: 'en',
     }
   },

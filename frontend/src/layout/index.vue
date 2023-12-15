@@ -3,16 +3,23 @@ import { NLayout, NLayoutHeader, NH2, NLayoutFooter } from 'naive-ui'
 import { useClientHeight } from '/@/composables/client-height'
 import UserMenu from './components/header/UserMenu.vue'
 import sidebar from './components/sidebar/index.vue'
+import Logo from '/@/layout/components/logo/index.vue'
 const { height } = useClientHeight()
 </script>
 <template>
   <n-layout :style="{ height: height + 'px' }">
-    <n-layout-header class="header" bordered>
-      <div class="header-user">
+    <n-layout-header
+      class="nav"
+      style="--side-padding: 32px; grid-template-columns: calc(272px - var(--side-padding)) 1fr auto"
+      bordered
+    >
+      <logo />
+      <div style="display: flex; align-items: center"></div>
+      <div class="nav-end">
         <user-menu />
       </div>
     </n-layout-header>
-    <n-layout position="absolute" style="top: 50px; bottom: 50px" has-sider>
+    <n-layout position="absolute" style="top: 64px; bottom: 50px" has-sider>
       <sidebar />
       <n-layout content-style="padding: 2px;" :native-scrollbar="false">
         <n-h2>平山道</n-h2>
@@ -40,16 +47,17 @@ const { height } = useClientHeight()
 </template>
 
 <style scoped>
-.header {
-  display: flex;
-  height: 50px;
-  padding: 12px;
+.nav {
+  display: grid;
+  grid-template-rows: calc(var(--header-height) - 1px);
+  padding: 0 var(--side-padding);
+}
+.nav .ui-logo {
   align-items: center;
-  .header-user {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 10px;
-  }
+}
+
+.nav-end {
+  align-items: center;
+  display: flex;
 }
 </style>

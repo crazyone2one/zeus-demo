@@ -62,14 +62,22 @@ const handleSelect = (key: string) => {
 }
 </script>
 <template>
-  <div class="user-menu">
-    <div class="set-item">
-      <n-dropdown trigger="click" :options="userOptions" @select="handleSelect">zeus</n-dropdown>
-    </div>
-  </div>
+  <n-dropdown trigger="click" :options="userOptions" @select="handleSelect">
+    <n-text class="nav-picker padded"> zeus </n-text>
+  </n-dropdown>
 </template>
 
 <style scoped>
+.nav-picker {
+  margin-right: 4px;
+}
+.nav-picker.padded {
+  padding: 0 10px;
+}
+
+.nav-picker:last-child {
+  margin-right: 0;
+}
 .user-menu {
   display: flex;
   height: 50px;
