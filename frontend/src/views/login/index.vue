@@ -50,14 +50,23 @@ const handleLogin = () => {
     <!-- <n-h2 style="--font-weight: 400">Sign-in</n-h2> -->
     <n-form size="large" :model="model">
       <n-form-item-row path="username">
-        <n-input v-model:value="model.username"> </n-input>
+        <n-input v-model:value="model.username" :placeholder="$t('organization.integration.input_api_account')">
+        </n-input>
       </n-form-item-row>
       <n-form-item-row path="password">
-        <n-input v-model:value="model.password" type="password" show-password-on="mousedown" @keyup.enter="handleLogin">
+        <n-input
+          v-model:value="model.password"
+          type="password"
+          :placeholder="$t('commons.password')"
+          show-password-on="mousedown"
+          @keyup.enter="handleLogin"
+        >
         </n-input>
       </n-form-item-row>
     </n-form>
-    <n-button type="primary" block :loading="loading" :disabled="disabled" @click="handleLogin"> login </n-button>
+    <n-button type="primary" block :loading="loading" :disabled="disabled" @click="handleLogin">
+      {{ $t('commons.login') }}
+    </n-button>
   </n-card>
 </template>
 

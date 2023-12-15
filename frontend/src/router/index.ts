@@ -1,10 +1,19 @@
 import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '/@/store/modules/auth-store'
+import { i18n } from '../i18n'
 
 // Define some routes
 const routes: RouteRecordRaw[] = [
   { path: '/', component: () => import(`/@/layout/index.vue`) },
-  { path: '/login', name: 'login', component: () => import('/@/views/login/index.vue') },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('/@/views/login/index.vue'),
+    meta: {
+      title: 'commons.login',
+      requiresAuth: false,
+    },
+  },
   // 将匹配所有内容并将其放在 `$route.params.pathMatch` 下
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import(`/@/views/error/NotFound.vue`) },
 ]
@@ -33,5 +42,13 @@ router.beforeEach((to, _from, next) => {
       next()
     }
   }
+})
+router.afterEach((to) => {
+  // TODO: title from sfc custom block?
+  // const current = to.matched[to.matched.length - 1].components.default
+  // const title = current.title ?? current.name
+  const items = [import.meta.env.VITE_APP_TITLE]
+  to.meta.title != null && items.unshift(i18n.t(to.meta.title as string))
+  document.title = items.join(' | ')
 })
 export default router

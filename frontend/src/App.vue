@@ -9,16 +9,28 @@ import {
   useOsTheme,
   darkTheme,
   zhCN,
+  enUS,
   dateZhCN,
+  dateEnUS,
 } from 'naive-ui'
 import BaseView from '/@/layout/components/BaseView.vue'
 import { computed } from 'vue'
+import { useSettingStore } from './store/modules/setting-store'
+
+const { language } = useSettingStore()
+
 const osTheme = useOsTheme()
 const theme = computed(() => (osTheme.value === 'dark' ? darkTheme : null))
+const locale = computed(() => {
+  return language === 'zh-cn' ? zhCN : enUS
+})
+const dateLocale = computed(() => {
+  return language === 'zh-cn' ? dateZhCN : dateEnUS
+})
 </script>
 
 <template>
-  <n-config-provider :theme="theme" :locale="zhCN" :date-locale="dateZhCN">
+  <n-config-provider :theme="theme" :locale="locale" :date-locale="dateLocale">
     <n-global-style />
     <n-loading-bar-provider>
       <n-dialog-provider>

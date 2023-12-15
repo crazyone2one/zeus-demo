@@ -9,8 +9,11 @@ import 'vfonts/Lato.css'
 // import 'vfonts/FiraCode.css'
 
 import pinia from './store'
+import i18n from './i18n'
+
 const app = createApp(App)
 app.use(router)
 app.use(naive)
 app.use(pinia)
+app.use(i18n)
 app.mount('#app')
