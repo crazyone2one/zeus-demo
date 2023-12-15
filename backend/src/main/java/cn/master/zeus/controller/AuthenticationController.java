@@ -2,6 +2,7 @@ package cn.master.zeus.controller;
 
 import cn.master.zeus.config.CommonResult;
 import cn.master.zeus.dto.request.AuthenticationRequest;
+import cn.master.zeus.dto.request.RefreshTokenRequest;
 import cn.master.zeus.dto.response.AuthenticationResponse;
 import cn.master.zeus.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -33,5 +34,10 @@ public class AuthenticationController {
     public CommonResult<String> logout(Principal principal) {
         authenticationService.logout(principal.getName());
         return CommonResult.success("User logged out successfully");
+    }
+
+    @PostMapping("/refresh")
+    public AuthenticationResponse refresh(@RequestBody @Valid RefreshTokenRequest request) {
+        return authenticationService.refreshToken(request);
     }
 }

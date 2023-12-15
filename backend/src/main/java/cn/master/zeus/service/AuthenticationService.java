@@ -16,7 +16,12 @@ public interface AuthenticationService {
     AuthenticationResponse login(AuthenticationRequest request);
 
     void logout(String userName);
-
+    /**
+     * refresh token
+     *
+     * @param request param
+     * @return cn.master.zeus.dto.response.AuthenticationResponse
+     */
     AuthenticationResponse refreshToken(RefreshTokenRequest request);
 }
 

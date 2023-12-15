@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,11 +67,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         val claimsJws = jwtProvider.validateToken(refreshToken);
         Claims body = claimsJws.getBody();
         val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(body.get("username"))).one();
+        val principal = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal.getSystemUser().getId().equals(user.getId())) {
+            val accessToken = jwtProvider.generateAccessToken(principal);
+            revokeUserToken(user, List.of(TokenType.ACCESS_TOKEN));
+            saveUserToken(user, accessToken, TokenType.ACCESS_TOKEN.name());
+            return AuthenticationResponse.builder()
+                    .accessToken(accessToken).refreshToken(refreshToken)
+                    .tokenType("bearer")
+                    .expiresIn(jwtExpiration)
+                    .userId(principal.getSystemUser().getId())
+                    .build();
+        }
         return null;
     }
 
