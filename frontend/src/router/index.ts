@@ -1,4 +1,5 @@
 import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router'
+import { useAuthStore } from '/@/store/modules/auth-store'
 
 // Define some routes
 const routes: RouteRecordRaw[] = [
@@ -17,5 +18,20 @@ const router = createRouter({
     return { top: 0 }
   },
 })
-
+router.beforeEach((to, _from, next) => {
+  const store = useAuthStore()
+  const isAuthenticated = store.accessToken || ''
+  if (to.path === '/login') {
+    isAuthenticated ? next('/') : next()
+  } else {
+    if (!isAuthenticated) {
+      store.$reset()
+      next(`/login?redirect=${to.path}&params=${JSON.stringify(to.query ? to.query : to.params)}`)
+    } else if (isAuthenticated && to.path === 'login') {
+      next('/')
+    } else {
+      next()
+    }
+  }
+})
 export default router

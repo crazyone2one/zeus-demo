@@ -4,11 +4,14 @@ import { ILoginParams, loginAPI } from '/@/api/modules/auth'
 import { NH1 } from 'naive-ui'
 import { useAuthStore } from '/@/store/modules/auth-store'
 import { useRequest } from 'alova'
+import { useRoute, useRouter } from 'vue-router'
 
 const model = ref<ILoginParams>({
   username: '',
   password: '',
 })
+const route = useRoute()
+const router = useRouter()
 const store = useAuthStore()
 const disabled = computed<boolean>(() => model.value.username === '' || model.value.password === '')
 const { loading, send } = useRequest(loginAPI(model.value), {
@@ -24,6 +27,19 @@ const handleLogin = () => {
         state.refreshToken = refreshToken
         state.userId = userId
       })
+      // 路由跳转
+      if (route.query?.redirect) {
+        router.push({
+          path: <string>route.query?.redirect,
+          query: route.query?.params
+            ? Object.keys(<string>route.query?.params).length > 0
+              ? JSON.parse(<string>route.query?.params)
+              : ''
+            : '',
+        })
+      } else {
+        router.push('/')
+      }
     })
     .catch((err) => window.$message.error(err.message))
 }

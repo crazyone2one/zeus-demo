@@ -1,6 +1,8 @@
 import { createAlova } from 'alova'
 import VueHook from 'alova/vue'
 import GlobalFetch from 'alova/GlobalFetch'
+import { useAuthStore } from '../store/modules/auth-store'
+
 const logOnDev = (message: string) => {
   if (import.meta.env.MODE === 'development') {
     console.debug(message)
@@ -17,7 +19,8 @@ const alovaInstance = createAlova({
     // https://alova.js.org/zh-CN/tutorial/getting-started/method-metadata#%E5%9C%A8%E8%AF%B7%E6%B1%82%E5%89%8D%E4%BD%BF%E7%94%A8%E8%BA%AB%E4%BB%BD%E6%A0%87%E8%AF%86
     if (!method.meta?.ignoreToken) {
       // 添加token到请求头
-      method.config.headers.token = 'token'
+      const { accessToken } = useAuthStore()
+      method.config.headers.Authorization = `Bearer ${accessToken}`
     }
   },
   responded: {
