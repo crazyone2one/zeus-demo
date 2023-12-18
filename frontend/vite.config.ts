@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
+import UnoCSS from 'unocss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -9,7 +10,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     // vite 配置
-    plugins: [vue()],
+    plugins: [vue(), UnoCSS()],
     // 服务器选项
     server: {
       host: true,

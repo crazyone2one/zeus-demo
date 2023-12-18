@@ -11,6 +11,8 @@ import 'vfonts/Lato.css'
 import pinia from './store'
 import i18n from './i18n'
 
+import 'virtual:uno.css'
+
 const app = createApp(App)
 app.use(router)
 app.use(naive)
