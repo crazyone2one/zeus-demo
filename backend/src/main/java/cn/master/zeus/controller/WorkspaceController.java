@@ -1,5 +1,8 @@
 package cn.master.zeus.controller;
 
+import cn.master.zeus.common.annotation.LogAnnotation;
+import cn.master.zeus.common.constants.OperateLogConstants;
+import cn.master.zeus.common.constants.OperateLogModule;
 import cn.master.zeus.dto.request.BaseRequest;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
@@ -39,6 +42,7 @@ public class WorkspaceController {
      * @return {@code Workspace} 添加成功
      */
     @PostMapping("special/add")
+    @LogAnnotation(module = OperateLogModule.SYSTEM_WORKSPACE, type = OperateLogConstants.CREATE, msClass = WorkspaceService.class, content = "#msClass.getLogDetails(#workspace.id)")
     public Workspace save(@RequestBody @Valid Workspace workspace) {
         return workspaceService.addWorkspaceByAdmin(workspace);
     }
@@ -50,7 +54,7 @@ public class WorkspaceController {
      */
     @DeleteMapping("special/delete/{workspaceId}")
     public void remove(@PathVariable String workspaceId) {
-         workspaceService.deleteWorkspace(workspaceId);
+        workspaceService.deleteWorkspace(workspaceId);
     }
 
     /**
@@ -91,7 +95,7 @@ public class WorkspaceController {
      * @return 分页对象
      */
     @PostMapping("page")
-    public Page<Workspace> page( @RequestBody BaseRequest request) {
+    public Page<Workspace> page(@RequestBody BaseRequest request) {
         return workspaceService.getAllWorkspaceList(request);
     }
 

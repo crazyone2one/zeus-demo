@@ -1,0 +1,14 @@
+package cn.master.zeus.common.constants;
+
+/**
+ * @author Created by 11's papa on 12/19/2023
+ **/
+public enum OperateLogConstants {
+    CREATE, DELETE, DEBUG, UPDATE, REVIEW, COPY, EXECUTE, SHARE, GC, RESTORE,
+    BATCH_DEL, BATCH_UPDATE, BATCH_ADD, BATCH_RESTORE, BATCH_GC,
+    IMPORT, EXPORT,
+    ASSOCIATE_CASE, ASSOCIATE_ISSUE, UN_ASSOCIATE_CASE,
+    LOGIN, PERMISSION_UPDATE, CREATE_PRE_TEST, OTHER,
+    MINDER_OPERATION,
+    REQUEST
+}

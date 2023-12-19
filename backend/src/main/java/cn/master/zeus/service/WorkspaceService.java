@@ -20,4 +20,6 @@ public interface WorkspaceService extends IService<Workspace> {
     void updateWorkspaceByAdmin(Workspace workspace);
 
     Page<Workspace> getAllWorkspaceList(BaseRequest request);
+
+    String getLogDetails(String workspaceId);
 }

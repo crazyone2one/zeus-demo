@@ -1,15 +1,20 @@
 package cn.master.zeus.service.impl;
 
+import cn.master.zeus.common.constants.SystemReference;
 import cn.master.zeus.common.constants.UserGroupConstants;
 import cn.master.zeus.common.exception.ServiceException;
 import cn.master.zeus.dto.request.BaseRequest;
 import cn.master.zeus.dto.request.QueryMemberRequest;
+import cn.master.zeus.dto.response.DetailColumn;
+import cn.master.zeus.dto.response.OperatingLogDetails;
 import cn.master.zeus.entity.UserGroup;
 import cn.master.zeus.entity.Workspace;
 import cn.master.zeus.mapper.UserGroupMapper;
 import cn.master.zeus.mapper.WorkspaceMapper;
 import cn.master.zeus.service.SystemUserService;
 import cn.master.zeus.service.WorkspaceService;
+import cn.master.zeus.util.JsonUtils;
+import cn.master.zeus.util.ReflexObjectUtil;
 import cn.master.zeus.util.SessionUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
@@ -20,6 +25,8 @@ import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.WORKSPACE_NAME_DUPLICATE;
 import static cn.master.zeus.entity.table.WorkspaceTableDef.WORKSPACE;
@@ -75,6 +82,14 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
             });
         }
         return paginate;
+    }
+
+    @Override
+    public String getLogDetails(String workspaceId) {
+        val workspace = mapper.selectOneById(workspaceId);
+        List<DetailColumn> columns = ReflexObjectUtil.getColumns(workspace, SystemReference.organizationColumns);
+        OperatingLogDetails details = new OperatingLogDetails(workspace.getId(), null, workspace.getName(), workspace.getCreateUser(), columns);
+        return JsonUtils.toJsonString(details);
     }
 
     private void checkWorkspace(Workspace workspace) {
