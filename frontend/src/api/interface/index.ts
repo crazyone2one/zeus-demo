@@ -13,7 +13,7 @@ export interface IPageResponse<T> {
   pageSize: number
   totalPage: number
   totalRow: number
-  records: T
+  records: Array<T>
 }
 /**
  * 查询参数类型

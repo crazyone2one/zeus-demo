@@ -20,4 +20,5 @@ public interface GlobalErrorCodeConstants {
     // ========== 服务端错误段 ==========
 
     ErrorCode INTERNAL_SERVER_ERROR = new ErrorCode(500, "系统异常");
+    ErrorCode WORKSPACE_NAME_DUPLICATE = new ErrorCode(1002004000, "工作空间名已存在");
 }

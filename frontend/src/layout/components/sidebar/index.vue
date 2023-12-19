@@ -9,7 +9,7 @@ const activeKey = ref<string | null>(null)
 const menuOptions: MenuOption[] = [
   {
     label: i18n.t('commons.my_workstation'),
-    key: 'workspace',
+    key: 'workstation',
     icon: () =>
       h(NIcon, null, {
         default: () => h('span', { class: 'i-my-icons-workspace' }),
@@ -55,6 +55,7 @@ const menuOptions: MenuOption[] = [
     // label: i18n.t("commons.project_setting"),
     label: () => h(RouterLink, { to: { path: '/project' } }, { default: () => i18n.t('commons.project_setting') }),
     key: 'project-setting',
+    disabled: true,
     icon: () =>
       h(NIcon, null, {
         default: () => h('span', { class: 'i-mdi:folder-cog-outline' }),
@@ -123,6 +124,7 @@ const menuOptions: MenuOption[] = [
     :width="240"
     :collapsed="collapsed"
     show-trigger
+    :native-scrollbar="false"
     @collapse="collapsed = true"
     @expand="collapsed = false"
   >

@@ -1,7 +1,10 @@
 package cn.master.zeus.service;
 
+import cn.master.zeus.dto.request.QueryMemberRequest;
 import com.mybatisflex.core.service.IService;
 import cn.master.zeus.entity.SystemUser;
+
+import java.util.List;
 
 /**
  *  服务层。
@@ -10,5 +13,5 @@ import cn.master.zeus.entity.SystemUser;
  * @since 1.0.0
  */
 public interface SystemUserService extends IService<SystemUser> {
-
+    List<SystemUser> getMemberList(QueryMemberRequest request);
 }
