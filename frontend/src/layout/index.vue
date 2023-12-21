@@ -4,6 +4,7 @@ import { useClientHeight } from '/@/composables/client-height'
 import UserMenu from './components/header/UserMenu.vue'
 import sidebar from './components/sidebar/index.vue'
 import Logo from '/@/layout/components/logo/index.vue'
+import SelectWorkspace from './components/header/SelectWorkspace.vue'
 const { height } = useClientHeight()
 </script>
 <template>
@@ -16,6 +17,7 @@ const { height } = useClientHeight()
       <logo />
       <div style="display: flex; align-items: center"></div>
       <div class="nav-end">
+        <select-workspace />
         <user-menu />
       </div>
     </n-layout-header>

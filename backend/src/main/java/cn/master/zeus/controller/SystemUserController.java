@@ -1,6 +1,14 @@
 package cn.master.zeus.controller;
 
+import cn.master.zeus.dto.CustomUserDetails;
+import cn.master.zeus.dto.UserDTO;
+import cn.master.zeus.dto.request.QueryMemberRequest;
+import cn.master.zeus.service.BaseCheckPermissionService;
+import cn.master.zeus.util.SessionUtils;
 import com.mybatisflex.core.paginate.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,26 +20,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.master.zeus.entity.SystemUser;
 import cn.master.zeus.service.SystemUserService;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
- *  控制层。
+ * 控制层。
  *
  * @author 11's papa
  * @since 1.0.0
  */
 @RestController
-@RequestMapping("/systemUser")
+@RequestMapping("/user")
+@RequiredArgsConstructor
 public class SystemUserController {
 
-    @Autowired
-    private SystemUserService systemUserService;
+    private final SystemUserService systemUserService;
+    final BaseCheckPermissionService baseCheckPermissionService;
 
     /**
      * 添加。
      *
-     * @param systemUser 
+     * @param systemUser
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
@@ -53,7 +64,7 @@ public class SystemUserController {
     /**
      * 根据主键更新。
      *
-     * @param systemUser 
+     * @param systemUser
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("update")
@@ -93,4 +104,15 @@ public class SystemUserController {
         return systemUserService.page(page);
     }
 
+    @GetMapping("/switch/source/ws/{sourceId}")
+    public UserDTO switchWorkspace(@PathVariable(value = "sourceId") String sourceId) {
+        val principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return systemUserService.switchUserResource("workspace", sourceId, principal);
+    }
+
+    @PostMapping("/ws/project/member/list/{workspaceId}")
+    public List<SystemUser> getProjectMemberListForWorkspace(@PathVariable String workspaceId, @RequestBody QueryMemberRequest request) {
+        baseCheckPermissionService.checkProjectBelongToWorkspace(request.getProjectId(), workspaceId);
+        return systemUserService.getProjectMemberList(request);
+    }
 }

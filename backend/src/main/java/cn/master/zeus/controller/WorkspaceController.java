@@ -4,6 +4,7 @@ import cn.master.zeus.common.annotation.LogAnnotation;
 import cn.master.zeus.common.constants.OperateLogConstants;
 import cn.master.zeus.common.constants.OperateLogModule;
 import cn.master.zeus.dto.request.BaseRequest;
+import cn.master.zeus.util.SessionUtils;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +76,11 @@ public class WorkspaceController {
     @GetMapping("list")
     public List<Workspace> list() {
         return workspaceService.list();
+    }
+
+    @GetMapping("/list/user/workspace")
+    public List<Workspace> listUserWorkspace() {
+        return workspaceService.getWorkspaceListByUserId(SessionUtils.getUserId());
     }
 
     /**

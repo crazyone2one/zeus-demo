@@ -5,6 +5,8 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import cn.master.zeus.entity.Workspace;
 
+import java.util.List;
+
 /**
  *  服务层。
  *
@@ -22,4 +24,6 @@ public interface WorkspaceService extends IService<Workspace> {
     Page<Workspace> getAllWorkspaceList(BaseRequest request);
 
     String getLogDetails(String workspaceId);
+
+    List<Workspace> getWorkspaceListByUserId(String userId);
 }

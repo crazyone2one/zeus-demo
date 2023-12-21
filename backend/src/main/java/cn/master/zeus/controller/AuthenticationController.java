@@ -5,6 +5,8 @@ import cn.master.zeus.dto.request.AuthenticationRequest;
 import cn.master.zeus.dto.request.RefreshTokenRequest;
 import cn.master.zeus.dto.response.AuthenticationResponse;
 import cn.master.zeus.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +28,8 @@ public class AuthenticationController {
     final AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody @Valid AuthenticationRequest request) {
-        return authenticationService.login(request);
+    public AuthenticationResponse login(@RequestBody @Valid AuthenticationRequest request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return authenticationService.login(request, httpServletRequest, httpServletResponse);
     }
 
     @PostMapping("/logout")

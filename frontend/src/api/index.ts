@@ -30,6 +30,10 @@ const alovaInstance = createAlova({
     onSuccess: async (response, method) => {
       logOnDev(`🚀 [API] ${method.url}  | Response ${response.status}`)
       if (response.status >= 400) {
+        // window.$message.error('请求失败') // 弹出错误提示
+        if (response.status === 500) {
+          throw new Error('系统异常')
+        }
         throw new Error(response.statusText)
       }
       const json = await response.json()

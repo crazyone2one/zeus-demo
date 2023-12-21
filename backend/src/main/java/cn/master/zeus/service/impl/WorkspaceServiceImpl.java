@@ -3,6 +3,7 @@ package cn.master.zeus.service.impl;
 import cn.master.zeus.common.constants.SystemReference;
 import cn.master.zeus.common.constants.UserGroupConstants;
 import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.dto.RelatedSource;
 import cn.master.zeus.dto.request.BaseRequest;
 import cn.master.zeus.dto.request.QueryMemberRequest;
 import cn.master.zeus.dto.response.DetailColumn;
@@ -26,9 +27,13 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.WORKSPACE_NAME_DUPLICATE;
+import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
+import static cn.master.zeus.entity.table.UserGroupTableDef.USER_GROUP;
 import static cn.master.zeus.entity.table.WorkspaceTableDef.WORKSPACE;
 
 /**
@@ -81,6 +86,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
                 item.setMemberSize(memberList.size());
             });
         }
+        paginate.setRecords(records);
         return paginate;
     }
 
@@ -90,6 +96,40 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         List<DetailColumn> columns = ReflexObjectUtil.getColumns(workspace, SystemReference.organizationColumns);
         OperatingLogDetails details = new OperatingLogDetails(workspace.getId(), null, workspace.getName(), workspace.getCreateUser(), columns);
         return JsonUtils.toJsonString(details);
+    }
+
+    @Override
+    public List<Workspace> getWorkspaceListByUserId(String userId) {
+        val superUser = userGroupMapper.isSuperUser(userId);
+        if (superUser) {
+            return mapper.selectAll();
+        }
+        List<RelatedSource> relatedSource = getRelatedSource(userId);
+        assert relatedSource != null;
+        List<String> wsIds = relatedSource
+                .stream()
+                .map(RelatedSource::getWorkspaceId)
+                .distinct()
+                .toList();
+        if (org.springframework.util.CollectionUtils.isEmpty(wsIds)) {
+            return new ArrayList<>();
+        }
+        return queryChain().where(WORKSPACE.ID.in(wsIds)).list();
+    }
+
+    private List<RelatedSource> getRelatedSource(String userId) {
+        val queryChain = QueryChain.of(UserGroup.class).select(PROJECT.WORKSPACE_ID.as("workspaceId"), PROJECT.ID.as("projectId"))
+                .from(USER_GROUP)
+                .join(PROJECT).on(USER_GROUP.SOURCE_ID.eq(PROJECT.ID))
+                .join(WORKSPACE).on(PROJECT.WORKSPACE_ID.eq(WORKSPACE.ID))
+                .where(USER_GROUP.USER_ID.eq(userId)).union(
+                        QueryChain.of(UserGroup.class).select(WORKSPACE.ID.as("workspaceId"))
+                                .select("''")
+                                .from(USER_GROUP)
+                                .join(WORKSPACE).on(USER_GROUP.SOURCE_ID.eq(WORKSPACE.ID))
+                                .where(USER_GROUP.USER_ID.eq(userId))
+                );
+        return mapper.selectListByQueryAs(queryChain, RelatedSource.class);
     }
 
     private void checkWorkspace(Workspace workspace) {

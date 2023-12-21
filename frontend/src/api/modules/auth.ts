@@ -1,3 +1,4 @@
+import { IUserDto } from './user'
 import alovaInstance from '/@/api/index'
 
 export interface ILoginParams {
@@ -8,6 +9,7 @@ interface ILoginRespItem {
   accessToken: string
   refreshToken: string
   userId: string
+  user: IUserDto
 }
 /**
  * 登录方法

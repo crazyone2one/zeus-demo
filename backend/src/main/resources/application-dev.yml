@@ -19,6 +19,8 @@ security:
 mybatis-flex:
   global-config:
     print-banner: false
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 rsa:
   private-key: classpath:certs/private-key.pem
   public-key: classpath:certs/public-key.pem

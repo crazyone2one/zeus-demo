@@ -21,4 +21,6 @@ public interface GlobalErrorCodeConstants {
 
     ErrorCode INTERNAL_SERVER_ERROR = new ErrorCode(500, "系统异常");
     ErrorCode WORKSPACE_NAME_DUPLICATE = new ErrorCode(1002004000, "工作空间名已存在");
+    ErrorCode PROJECT_NAME_DUPLICATE = new ErrorCode(200000, "项目名已存在");
+    ErrorCode CHECK_OWNER_PROJECT = new ErrorCode(200001, "当前用户没有操作此项目的权限");
 }

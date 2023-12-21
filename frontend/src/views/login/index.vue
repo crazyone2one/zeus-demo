@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { ILoginParams, loginAPI } from '/@/api/modules/auth'
 import { NH1 } from 'naive-ui'
 import { useAuthStore } from '/@/store/modules/auth-store'
+import { useUserStore } from '/@/store/modules/user-store'
 import { useRequest } from 'alova'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -21,12 +22,15 @@ const handleLogin = () => {
   send()
     .then((res) => {
       const _res = res
-      const { accessToken, refreshToken, userId } = _res
+      const { accessToken, refreshToken, userId, user } = _res
       store.$patch((state) => {
         state.accessToken = accessToken
         state.refreshToken = refreshToken
         state.userId = userId
       })
+      const userStore = useUserStore()
+      userStore.user = user
+      userStore.saveSessionStorage(user)
       // 路由跳转
       if (route.query?.redirect) {
         router.push({

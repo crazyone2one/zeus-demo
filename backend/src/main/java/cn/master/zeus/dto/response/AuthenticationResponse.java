@@ -1,5 +1,6 @@
 package cn.master.zeus.dto.response;
 
+import cn.master.zeus.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class AuthenticationResponse {
     private Integer expiresIn;
     private String refreshToken;
     private String userId;
+    private UserDTO user;
 }

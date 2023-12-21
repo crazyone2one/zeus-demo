@@ -33,7 +33,8 @@ export interface IQueryParam {
   }
   [key: string]: string | number | Array<number> | unknown | []
 }
-export interface ITableDataInfo<T> {
-  data?: T
-  total: number
+export interface IQueryMemberRequest {
+  name: string
+  workspaceId: string
+  projectId: string
 }
