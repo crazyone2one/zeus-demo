@@ -4,6 +4,7 @@ import { NAvatar, NText } from 'naive-ui'
 import { h } from 'vue'
 import { logoutAPI } from '/@/api/modules/auth'
 import { useAuthStore } from '/@/store/modules/auth-store'
+import { useUserStore } from '/@/store/modules/user-store'
 import router from '/@/router'
 
 const store = useAuthStore()
@@ -49,6 +50,7 @@ const handleSelect = (key: string) => {
       onPositiveClick() {
         send().then(() => {
           store.$reset()
+          useUserStore().initUser()
           const route = router.currentRoute
           router.push(
             `/login?redirect=${route.value.path}&params=${JSON.stringify(

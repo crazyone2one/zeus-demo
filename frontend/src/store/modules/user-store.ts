@@ -37,7 +37,10 @@ export const useUserStore = defineStore(
         sessionStorage.setItem('workspace_id', user.lastWorkspaceId)
       }
     }
-    return { user, saveSessionStorage }
+    const initUser = () => {
+      user.value = {} as IUserDto
+    }
+    return { user, saveSessionStorage, initUser }
   },
   { persist: true },
 )

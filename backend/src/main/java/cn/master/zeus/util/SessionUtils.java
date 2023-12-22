@@ -1,7 +1,9 @@
 package cn.master.zeus.util;
 
+import cn.master.zeus.dto.CustomUserDetails;
 import cn.master.zeus.entity.SystemUser;
 import com.mybatisflex.core.query.QueryChain;
+import lombok.val;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +16,8 @@ import static cn.master.zeus.entity.table.SystemUserTableDef.SYSTEM_USER;
 public class SessionUtils {
     public static String sessionUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (String) authentication.getPrincipal();
+        val principal = (CustomUserDetails)authentication.getPrincipal();
+        return  principal.getUsername();
     }
 
     public static SystemUser sessionSystemUser() {

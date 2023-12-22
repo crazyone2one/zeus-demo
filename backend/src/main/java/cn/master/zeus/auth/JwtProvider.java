@@ -33,19 +33,22 @@ public class JwtProvider {
     private long refreshExpiration;
 
     public String generateAccessToken(CustomUserDetails userDetails) {
+        return buildJwtToken(getStringObjectMap(userDetails), jwtExpiration);
+    }
+
+    public String generateRefreshToken(CustomUserDetails userDetails) {
+        Map<String, Object> tokenBody = getStringObjectMap(userDetails);
+        return buildJwtToken(tokenBody, refreshExpiration);
+    }
+
+    private static Map<String, Object> getStringObjectMap(CustomUserDetails userDetails) {
         Collection<? extends GrantedAuthority> userDetailsAuthorities = userDetails.getAuthorities();
         String authorities = userDetailsAuthorities.stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
         Map<String, Object> tokenBody = new LinkedHashMap<>();
         tokenBody.put("username", userDetails.getUsername());
         tokenBody.put("authorities", authorities);
-        return buildJwtToken(tokenBody, jwtExpiration);
-    }
-
-    public String generateRefreshToken(CustomUserDetails userDetails) {
-        Map<String, Object> tokenBody = new LinkedHashMap<>();
-        tokenBody.put("username", userDetails.getUsername());
-        return buildJwtToken(tokenBody, refreshExpiration);
+        return tokenBody;
     }
 
     public Jws<Claims> validateToken(String token) {

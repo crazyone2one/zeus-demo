@@ -1,6 +1,7 @@
 package cn.master.zeus.auth;
 
 import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,6 +35,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     final JwtProvider jwtProvider;
+    final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,15 +58,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = new HashSet<>();
             Arrays.asList(authorities.split(" "))
                     .forEach(a -> simpleGrantedAuthorities.add(new SimpleGrantedAuthority(a)));
+            // 将认证成功的用户保存到上下文
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    username,
-                    null,
+                    userDetails,
+                    userDetails.getPassword(),
                     simpleGrantedAuthorities
             );
             log.info("authenticated user with email/username :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (ExpiredJwtException e) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Expired JWT token");
         } catch (UnsupportedJwtException exception) {
             throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Unsupported JWT token");
         } catch (MalformedJwtException exception) {

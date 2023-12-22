@@ -21,15 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.master.zeus.entity.table.SystemGroupTableDef.SYSTEM_GROUP;
 import static cn.master.zeus.entity.table.SystemTokenTableDef.SYSTEM_TOKEN;
@@ -54,32 +52,44 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtProvider jwtProvider;
     final UserGroupPermissionMapper userGroupPermissionMapper;
     final SystemTokenMapper tokenMapper;
-    @Value("${security.jwt.accessToken.expiration:86400000}")
-    private Integer jwtExpiration;
-    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AuthenticationResponse login(AuthenticationRequest request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-        securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
-        val principal = (CustomUserDetails) authentication.getPrincipal();
-        val accessToken = jwtProvider.generateAccessToken(principal);
-        val refreshToken = jwtProvider.generateRefreshToken(principal);
-        revokeUserToken(principal.getSystemUser(), Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
-        saveUserToken(principal.getSystemUser(), accessToken, TokenType.ACCESS_TOKEN.name());
-        saveUserToken(principal.getSystemUser(), refreshToken, TokenType.REFRESH_TOKEN.name());
-        val userInfo = getUserInfo(principal.getSystemUser().getId());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(request.getUsername())).one();
+        val userDTO = getUserInfo(user.getId());
+        CustomUserDetails customUserDetails = getCustomUserDetails(userDTO, user);
+        val accessToken = jwtProvider.generateAccessToken(customUserDetails);
+        val refreshToken = jwtProvider.generateRefreshToken(customUserDetails);
+        revokeUserToken(customUserDetails.getSystemUser(), Arrays.asList(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN));
+        saveUserToken(customUserDetails.getSystemUser(), accessToken, TokenType.ACCESS_TOKEN.name());
+        saveUserToken(customUserDetails.getSystemUser(), refreshToken, TokenType.REFRESH_TOKEN.name());
+        val userInfo = getUserInfo(customUserDetails.getSystemUser().getId());
         return AuthenticationResponse.builder()
                 .accessToken(accessToken).refreshToken(refreshToken)
-                .tokenType("bearer")
-                .expiresIn(jwtExpiration)
-                .userId(principal.getSystemUser().getId())
+                .userId(customUserDetails.getSystemUser().getId())
                 .user(userInfo)
                 .build();
+    }
+
+
+    private CustomUserDetails getCustomUserDetails(UserDTO userDTO, SystemUser user) {
+        List<String> roles = new ArrayList<>();
+        List<GroupResourceDTO> groupPermissions = userDTO.getGroupPermissions();
+        if (CollectionUtils.isNotEmpty(groupPermissions)) {
+            List<List<UserGroupPermission>> list = groupPermissions.stream().map(GroupResourceDTO::getUserGroupPermissions).toList();
+            if (CollectionUtils.isNotEmpty(list)) {
+                list.forEach(p -> {
+                            List<String> list1 = p.stream().map(UserGroupPermission::getPermissionId).toList();
+                            roles.addAll(list1);
+                        }
+                );
+            }
+        }
+        List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return new CustomUserDetails(user, authorities);
     }
 
     @Override
@@ -96,21 +106,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         val claimsJws = jwtProvider.validateToken(refreshToken);
         Claims body = claimsJws.getBody();
         val user = QueryChain.of(SystemUser.class).where(SYSTEM_USER.NAME.eq(body.get("username"))).one();
-        val principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal.getSystemUser().getId().equals(user.getId())) {
-            val accessToken = jwtProvider.generateAccessToken(principal);
-            revokeUserToken(user, List.of(TokenType.ACCESS_TOKEN));
-            saveUserToken(user, accessToken, TokenType.ACCESS_TOKEN.name());
-            val userInfo = getUserInfo(principal.getSystemUser().getId());
-            return AuthenticationResponse.builder()
-                    .accessToken(accessToken).refreshToken(refreshToken)
-                    .tokenType("bearer")
-                    .expiresIn(jwtExpiration)
-                    .userId(principal.getSystemUser().getId())
-                    .user(userInfo)
-                    .build();
-        }
-        return null;
+        val userDTO = getUserInfo(user.getId());
+        CustomUserDetails customUserDetails = getCustomUserDetails(userDTO, user);
+        val accessToken = jwtProvider.generateAccessToken(customUserDetails);
+        revokeUserToken(user, List.of(TokenType.ACCESS_TOKEN));
+        saveUserToken(user, accessToken, TokenType.ACCESS_TOKEN.name());
+        val userInfo = getUserInfo(user.getId());
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken).refreshToken(refreshToken)
+                .userId(user.getId())
+                .user(userInfo)
+                .build();
     }
 
     @Override
