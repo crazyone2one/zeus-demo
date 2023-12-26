@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import NModalDialog from '/@/components/NModalDialog.vue'
-import { IUserItem, specialCreateUser } from '/@/api/modules/user'
-import { getUserAllGroups, getAllUserGroupByType, IGroup } from '/@/api/modules/group'
 import { useForm } from '@alova/scene-vue'
-import { FormInst, FormRules, SelectOption } from 'naive-ui'
-import { i18n } from '/@/i18n'
 import { useRequest } from 'alova'
-import { GROUP_TYPE } from '/@/utils/constants'
+import { FormInst, FormRules, SelectOption } from 'naive-ui'
+import { ref } from 'vue'
+import { IGroup, getAllUserGroupByType, getUserAllGroups } from '/@/api/modules/group'
 import { IProjectItem } from '/@/api/modules/project'
+import { IUserItem, specialCreateUser } from '/@/api/modules/user'
 import { IWorkspaceItem } from '/@/api/modules/workspace'
+import NModalDialog from '/@/components/NModalDialog.vue'
+import { i18n } from '/@/i18n'
+import { GROUP_TYPE } from '/@/utils/constants'
 
 const modalDialog = ref<InstanceType<typeof NModalDialog> | null>(null)
 const formRef = ref<FormInst | null>(null)
@@ -61,13 +61,13 @@ const handleSave = () => {
   formRef.value?.validate((err) => {
     if (!err) {
       console.log(`output->model.value`, model.value)
-      // submit()
-      //   .then(() => {
-      //     modalDialog.value?.hideModal()
-      //     emit('refresh')
-      //     window.$message.success(i18n.t('commons.save_success'))
-      //   })
-      //   .catch((e) => window.$message.error(e.message))
+      submit()
+        .then(() => {
+          modalDialog.value?.hideModal()
+          emit('refresh')
+          window.$message.success(i18n.t('commons.save_success'))
+        })
+        .catch((e) => window.$message.error(e.message))
     } else {
       return
     }

@@ -1,13 +1,13 @@
 import { IPageResponse, IQueryMemberRequest, IQueryParam } from '../interface'
-import { IGroup, IUserGroup, IGroupResourceDto } from './group'
+import { IGroup, IGroupResourceDto, IUserGroup } from './group'
 import alovaInstance from '/@/api/index'
 export interface IUserItem {
   id: string
   name: string
   email: string
   phone: string
-  lastProjectId?: string
-  lastWorkspaceId?: string
+  lastProjectId: string
+  lastWorkspaceId: string
   status: boolean
   password?: string
   groups?: Array<IGroup>

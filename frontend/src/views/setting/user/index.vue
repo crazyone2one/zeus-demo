@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, h } from 'vue'
-import NTableHeader from '/@/components/NTableHeader.vue'
-import { IQueryParam } from '/@/api/interface'
-import { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import { i18n } from '/@/i18n'
 import { usePagination } from '@alova/scene-vue'
-import NPagination from '/@/components/NPagination.vue'
+import { DataTableColumns, DataTableRowKey } from 'naive-ui'
+import { h, onMounted, reactive, ref } from 'vue'
 import EditUser from './components/EditUser.vue'
+import { IQueryParam } from '/@/api/interface'
 import { IUserItem, specialListUsers } from '/@/api/modules/user'
+import NPagination from '/@/components/NPagination.vue'
+import NTableHeader from '/@/components/NTableHeader.vue'
 import NTableOperator from '/@/components/NTableOperator.vue'
+import { i18n } from '/@/i18n'
 
 const condition = reactive<IQueryParam>({
   name: '',
@@ -43,7 +43,15 @@ const columns: DataTableColumns<IUserItem> = [
     title: i18n.t('commons.operating'),
     key: 'operating',
     render(row) {
-      return h(NTableOperator, { onEditClick: () => handleEdit(row) }, {})
+      return h(
+        NTableOperator,
+        {
+          onEditClick: () => handleEdit(row),
+          editPermission: ['SYSTEM_USER:READ+EDIT'],
+          deletePermission: ['SYSTEM_USER:READ+DELETE'],
+        },
+        {},
+      )
     },
   },
 ]
@@ -102,6 +110,7 @@ onMounted(() => {
         <n-table-header
           :condition="condition"
           :create-tip="$t('user.create')"
+          :create-permission="['SYSTEM_USER:READ+CREATE']"
           @search="handleList"
           @create="handleCreate"
         />

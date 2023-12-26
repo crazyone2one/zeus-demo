@@ -24,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -48,21 +49,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             val claimsJws = jwtProvider.validateToken(token);
             Claims body = claimsJws.getBody();
             String username = (String) body.get("username");
-            String authorities;
-            if (body.get("authorities") == null) {
-                throw new MissingClaimException(claimsJws.getHeader(), body, "Token is invalid");
-            } else {
-                authorities = (String) body.get("authorities");
-            }
-            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = new HashSet<>();
-            Arrays.asList(authorities.split(" "))
-                    .forEach(a -> simpleGrantedAuthorities.add(new SimpleGrantedAuthority(a)));
             // 将认证成功的用户保存到上下文
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     userDetails.getPassword(),
-                    simpleGrantedAuthorities
+                    userDetails.getAuthorities()
             );
             log.info("authenticated user with email/username :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);

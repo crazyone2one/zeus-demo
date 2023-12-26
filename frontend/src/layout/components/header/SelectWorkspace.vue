@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { NPopselect, SelectOption } from 'naive-ui'
-import { getUserWorkspaceList, switchWorkspace } from '/@/api/modules/workspace'
 import { useRequest } from 'alova'
+import { NPopselect, SelectOption } from 'naive-ui'
+import { computed, onMounted, ref, watch } from 'vue'
+import { getUserWorkspaceList, switchWorkspace } from '/@/api/modules/workspace'
 import { getCurrentWorkspaceId } from '/@/utils/token'
 
 const _workspaceId = computed(() => {
@@ -17,21 +17,23 @@ const initMenuData = () => {
   send()
 }
 onSuccess((response) => {
-  response.data.forEach((item) => {
-    const option: SelectOption = {}
-    option.label = item.name
-    option.value = item.id
-    workspaceList.value.push(option)
-    wsListCopy.value.push(option)
-  })
-  let workspace = response.data.filter((r) => r.id === workspaceId.value)
-  if (workspace.length > 0) {
-    currentWorkspaceName.value = workspace[0].name
-    workspaceList.value = workspaceList.value.filter((r) => r.value !== workspaceId.value)
-    workspaceList.value.unshift({ label: currentWorkspaceName.value, value: workspaceId.value })
-  } else {
-    currentWorkspaceName.value = response.data[0].name
-    _changeWs(response.data[0].id)
+  if (response.data) {
+    response.data.forEach((item) => {
+      const option: SelectOption = {}
+      option.label = item.name
+      option.value = item.id
+      workspaceList.value.push(option)
+      wsListCopy.value.push(option)
+    })
+    let workspace = response.data.filter((r) => r.id === workspaceId.value)
+    if (workspace.length > 0) {
+      currentWorkspaceName.value = workspace[0].name
+      workspaceList.value = workspaceList.value.filter((r) => r.value !== workspaceId.value)
+      workspaceList.value.unshift({ label: currentWorkspaceName.value, value: workspaceId.value })
+    } else {
+      currentWorkspaceName.value = response.data[0].name
+      _changeWs(response.data[0].id)
+    }
   }
 })
 const { send: changeWs } = useRequest((value) => switchWorkspace(value), { immediate: false })
@@ -67,7 +69,7 @@ watch(
     scrollable
     @update-value="handleChange"
   >
-    <n-button>{{ currentWorkspaceName || '弹出选择' }}</n-button>
+    <n-button>{{ currentWorkspaceName || '未选择workspace' }}</n-button>
     <template #header> 不知道放些什么 </template>
     <template #empty> 没啥看的，这里是空的 </template>
     <template #action> 如果你点开了这个例子，你可能需要它 </template>

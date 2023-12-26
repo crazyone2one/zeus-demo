@@ -37,8 +37,14 @@ export const useUserStore = defineStore(
         sessionStorage.setItem('workspace_id', user.lastWorkspaceId)
       }
     }
+    const clearSessionStorage = (): void => {
+      sessionStorage.removeItem('workspace_id')
+      sessionStorage.removeItem('project_id')
+      sessionStorage.removeItem('workspace_name')
+    }
     const initUser = () => {
       user.value = {} as IUserDto
+      clearSessionStorage()
     }
     return { user, saveSessionStorage, initUser }
   },

@@ -1,10 +1,10 @@
-import { createAlova } from 'alova'
-import VueHook from 'alova/vue'
-import GlobalFetch from 'alova/GlobalFetch'
-import { useAuthStore } from '../store/modules/auth-store'
 import { createServerTokenAuthentication } from '@alova/scene-vue'
-import { refreshUserToken } from './modules/auth'
+import { createAlova } from 'alova'
+import GlobalFetch from 'alova/GlobalFetch'
+import VueHook from 'alova/vue'
+import { useAuthStore } from '../store/modules/auth-store'
 import { getCurrentProjectId, getCurrentWorkspaceId } from '../utils/token'
+import { refreshUserToken } from './modules/auth'
 
 // const logOnDev = (message: string) => {
 //   if (import.meta.env.MODE === 'development') {
@@ -58,7 +58,9 @@ const alovaInstance = createAlova({
     // 第二个参数为当前请求的method实例，你可以用它同步请求前后的配置信息
     // TODO: 401重新登录系统
     if (response.status >= 400) {
-      // window.$message.error('请求失败') // 弹出错误提示
+      if (response.status === 403) {
+        window.$message.error('Access Denied') // 弹出错误提示
+      }
       if (response.status === 500) {
         throw new Error('系统异常')
       }

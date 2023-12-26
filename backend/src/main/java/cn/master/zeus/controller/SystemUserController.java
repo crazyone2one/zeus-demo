@@ -1,5 +1,6 @@
 package cn.master.zeus.controller;
 
+import cn.master.zeus.dto.CustomUserDetails;
 import cn.master.zeus.dto.UserDTO;
 import cn.master.zeus.dto.UserGroupPermissionDTO;
 import cn.master.zeus.dto.request.EditPasswordRequest;
@@ -12,6 +13,7 @@ import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,14 +117,15 @@ public class SystemUserController {
      * @return 分页对象
      */
     @PostMapping("page")
+    @PreAuthorize("hasAuthority('SYSTEM_USER:READ')")
     public Page<SystemUser> page(@RequestBody cn.master.zeus.dto.request.UserRequest request) {
         return systemUserService.getUserPageData(request);
     }
 
     @GetMapping("/switch/source/ws/{sourceId}")
     public UserDTO switchWorkspace(@PathVariable(value = "sourceId") String sourceId) {
-        val principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return systemUserService.switchUserResource("workspace", sourceId, principal);
+        val principal = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return systemUserService.switchUserResource("workspace", sourceId, principal.getUsername());
     }
 
     @PostMapping("/ws/project/member/list/{workspaceId}")
