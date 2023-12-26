@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { usePagination } from '@alova/scene-vue'
+import { useRequest } from 'alova'
 import { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { h, onMounted, reactive, ref, withDirectives } from 'vue'
 import EditPermission from './components/EditPermission.vue'
 import EditUserGroup from './components/EditUserGroup.vue'
 import { IQueryParam } from '/@/api/interface'
-import { IGroup, queryGroupPage } from '/@/api/modules/group'
+import { IGroup, delUserGroupById, queryGroupPage } from '/@/api/modules/group'
+import NDeleteConfirm from '/@/components/NDeleteConfirm.vue'
 import NPagination from '/@/components/NPagination.vue'
 import NTableHeader from '/@/components/NTableHeader.vue'
 import NTableOperator from '/@/components/NTableOperator.vue'
@@ -21,6 +23,7 @@ const condition = reactive<IQueryParam>({
 })
 const editUserGroup = ref<InstanceType<typeof EditUserGroup> | null>(null)
 const editPermission = ref<InstanceType<typeof EditPermission> | null>(null)
+const deleteConfirm = ref<InstanceType<typeof NDeleteConfirm> | null>(null)
 const columns: DataTableColumns<IGroup> = [
   {
     type: 'selection',
@@ -60,6 +63,7 @@ const columns: DataTableColumns<IGroup> = [
           editPermission: ['SYSTEM_GROUP:READ+EDIT'],
           deletePermission: ['SYSTEM_GROUP:READ+DELETE'],
           onEditClick: () => handleEdit(row),
+          onDeleteClick: () => handleDelete(row),
         },
         {
           middle: () => {
@@ -125,6 +129,16 @@ const handleEdit = (row: IGroup) => {
   }
   editUserGroup.value?.open('edit', i18n.t('group.edit'), row)
 }
+const handleDelete = (row: IGroup) => {
+  deleteConfirm.value?.open(row)
+}
+const { send: deleteUg } = useRequest((id) => delUserGroupById(id), { immediate: false })
+const _handleDel = (row: IGroup) => {
+  deleteUg(row.id).then(() => {
+    window.$message.success(i18n.t('commons.delete_success'))
+    loadTableData()
+  })
+}
 const setPermission = (row: IGroup) => {
   editPermission.value?.open(row)
 }
@@ -152,6 +166,7 @@ onMounted(() => {
   </n-spin>
   <edit-user-group ref="editUserGroup" @refresh="loadTableData" />
   <edit-permission ref="editPermission" />
+  <n-delete-confirm ref="deleteConfirm" :title="$t('group.delete')" @delete="_handleDel" />
 </template>
 
 <style scoped></style>

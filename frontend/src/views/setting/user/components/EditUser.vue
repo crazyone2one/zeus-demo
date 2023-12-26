@@ -5,7 +5,7 @@ import { FormInst, FormRules, SelectOption } from 'naive-ui'
 import { ref } from 'vue'
 import { IGroup, getAllUserGroupByType, getUserAllGroups } from '/@/api/modules/group'
 import { IProjectItem } from '/@/api/modules/project'
-import { IUserItem, specialCreateUser } from '/@/api/modules/user'
+import { IUserItem, specialCreateUser, specialModifyUser } from '/@/api/modules/user'
 import { IWorkspaceItem } from '/@/api/modules/workspace'
 import NModalDialog from '/@/components/NModalDialog.vue'
 import { i18n } from '/@/i18n'
@@ -25,7 +25,7 @@ const {
   send: submit,
   // 响应式的表单数据，内容由initialForm决定
   form: model,
-} = useForm((model) => specialCreateUser(model), {
+} = useForm((model) => (type.value === 'Add' ? specialCreateUser(model) : specialModifyUser(model)), {
   // 初始化表单数据
   initialForm: {
     id: '',
@@ -60,7 +60,6 @@ const emit = defineEmits(['refresh'])
 const handleSave = () => {
   formRef.value?.validate((err) => {
     if (!err) {
-      console.log(`output->model.value`, model.value)
       submit()
         .then(() => {
           modalDialog.value?.hideModal()
@@ -93,7 +92,7 @@ const open = (_type?: string, _title?: string, row?: IUserItem): void => {
   modalDialog.value?.show()
   submiting.value = false
 }
-const handleWorkspaceOption = (group: IGroup, workspaces: Array<IWorkspaceItem>): void => {
+const handleWorkspaceOption = (group: IGroup, workspaces: Array<IWorkspaceItem> | undefined): void => {
   if (!workspaces) {
     return
   }
@@ -121,7 +120,7 @@ const handleWorkspaceOption = (group: IGroup, workspaces: Array<IWorkspaceItem>)
     }
   })
 }
-const handleProjectOption = (group: IGroup, projects: Array<IProjectItem>): void => {
+const handleProjectOption = (group: IGroup, projects: Array<IProjectItem> | undefined): void => {
   if (!projects) {
     return
   }
@@ -222,15 +221,16 @@ const setWorkSpaceIds = (ids: Array<string>, projects: Array<IProjectItem>) => {
         currentGroupWSIds.value.add(project.workspaceId)
         if (
           model.value.groups[currentWSGroupIndex.value] &&
-          model.value.groups[currentWSGroupIndex.value].ids.indexOf(project.workspaceId) === -1
+          model.value.groups[currentWSGroupIndex.value].ids?.indexOf(project.workspaceId) === -1
         ) {
-          model.value.groups[currentWSGroupIndex.value].ids.push(project.workspaceId)
+          model.value.groups[currentWSGroupIndex.value].ids?.push(project.workspaceId)
         } else if (
           model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE').length > 0 &&
           model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE')[0].ids &&
-          model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE')[0].ids.indexOf(project.workspaceId) === -1
+          model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE')[0].ids?.indexOf(project.workspaceId) ===
+            -1
         ) {
-          model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE')[0].ids.push(project.workspaceId)
+          model.value.groups.filter((g) => g?.type === 'ws_member+WORKSPACE')[0].ids?.push(project.workspaceId)
         }
       }
     })

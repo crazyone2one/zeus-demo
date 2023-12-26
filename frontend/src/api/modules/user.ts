@@ -10,11 +10,11 @@ export interface IUserItem {
   lastWorkspaceId: string
   status: boolean
   password?: string
-  groups?: Array<IGroup>
+  groups: Array<IGroup>
 }
 export interface IUserDto extends IUserItem {
   userGroups?: Array<IUserGroup>
-  groups?: Array<IGroup>
+  groups: Array<IGroup>
   groupPermissions?: Array<IGroupResourceDto>
 }
 
@@ -22,6 +22,7 @@ export const getProjectMemberPages = (workspaceId: string, param: IQueryMemberRe
   alovaInstance.Post<Array<IUserItem>>(`/user/ws/project/member/list/${workspaceId}`, param)
 
 export const specialCreateUser = (user: IUserItem) => alovaInstance.Post<IUserItem>('/user/save', user)
+export const specialModifyUser = (user: IUserItem) => alovaInstance.Post<IUserItem>('/user/update', user)
 export const specialListUsers = (page: number, pageSize: number, params: IQueryParam) => {
   params.pageNumber = page
   params.pageSize = pageSize

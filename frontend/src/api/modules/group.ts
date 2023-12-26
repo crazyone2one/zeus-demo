@@ -67,3 +67,4 @@ export const createUserGroup = (param: IGroup) => alovaInstance.Post<IGroup>('/u
 export const modifyUserGroup = (param: IGroup) => alovaInstance.Post<IGroup>('/user/group/save', param)
 export const getUserGroupPermission = (param: IGroup) =>
   alovaInstance.Post<IGroupPermissionDTO>('/user/group/permission', param)
+export const delUserGroupById = (ugId: string) => alovaInstance.Get(`/user/group/remove/${ugId}`)
