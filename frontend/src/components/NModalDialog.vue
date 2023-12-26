@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import { NModal } from 'naive-ui'
 import { ref } from 'vue'
 import { i18n } from '/@/i18n'
-import { NModal } from 'naive-ui'
 
 interface Props {
   title?: string
   showFooter?: boolean // 是否展示底部操作按钮
   btnText?: string
+  dialogWidth?: string
 }
 withDefaults(defineProps<Props>(), {
   title: i18n.t('commons.operating'), // modal title
   showFooter: true, // show footer button
   btnText: '',
+  dialogWidth: '446px',
 })
 const showModal = ref(false)
 const emits = defineEmits(['confirm', 'cancel', 'saveAsEdit', 'closeModal'])
@@ -36,7 +38,14 @@ defineExpose({ toggleModal, show, hideModal })
 </script>
 <template>
   <div>
-    <n-modal v-model:show="showModal" :mask-closable="false" :show-icon="false" preset="dialog" :title="title">
+    <n-modal
+      v-model:show="showModal"
+      :mask-closable="false"
+      :show-icon="false"
+      preset="dialog"
+      :style="{ width: dialogWidth }"
+      :title="title"
+    >
       <slot name="content" />
       <template #action>
         <n-space v-if="showFooter" justify="end">

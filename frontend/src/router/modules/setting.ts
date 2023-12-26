@@ -26,16 +26,16 @@ const Setting: Array<RouteRecordRaw> = [
   //     component: () => import(`/@/views/setting/organization/index.vue`),
   //     meta: { title: "organization", requiresAuth: true },
   //   },
-  //   {
-  //     path: "/setting/usergroup",
-  //     name: "usergroup",
-  //     component: () => import(`/@/views/setting/group/index.vue`),
-  //     meta: {
-  //       title: "group.group_permission",
-  //       permissions: ["SYSTEM_GROUP:READ"],
-  //       system: true,
-  //     },
-  //   },
+    {
+      path: "/setting/usergroup",
+      name: "usergroup",
+      component: () => import(`/@/views/setting/group/index.vue`),
+      meta: {
+        title: "group.group_permission",
+        permissions: ["SYSTEM_GROUP:READ"],
+        system: true,
+      },
+    },
 
   {
     path: '/project/:type',

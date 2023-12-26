@@ -1,6 +1,6 @@
 package cn.master.zeus.service.impl;
 
-import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.entity.Project;
 import cn.master.zeus.service.BaseCheckPermissionService;
 import com.mybatisflex.core.query.QueryChain;
@@ -23,7 +23,7 @@ public class BaseCheckPermissionServiceImpl  implements BaseCheckPermissionServi
         // 实现逻辑
         val project = QueryChain.of(Project.class).where(PROJECT.ID.eq(projectId)).one();
         if (Objects.isNull(project) || !StringUtils.equals(project.getWorkspaceId(), workspaceId)) {
-            throw new ServiceException(CHECK_OWNER_PROJECT);
+            throw new BusinessException(CHECK_OWNER_PROJECT);
         }
     }
 }

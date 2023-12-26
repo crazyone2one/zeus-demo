@@ -1,7 +1,7 @@
 package cn.master.zeus.config;
 
 import cn.master.zeus.common.exception.ErrorCode;
-import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -45,7 +45,7 @@ public class CommonResult<T> {
         return result;
     }
 
-    public static <T> CommonResult<T> error(ServiceException serviceException) {
-        return error(serviceException.getCode(), serviceException.getMessage());
+    public static <T> CommonResult<T> error(BusinessException businessException) {
+        return error(businessException.getCode(), businessException.getMessage());
     }
 }

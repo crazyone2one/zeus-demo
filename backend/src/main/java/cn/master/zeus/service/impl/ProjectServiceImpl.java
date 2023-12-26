@@ -1,14 +1,13 @@
 package cn.master.zeus.service.impl;
 
 import cn.master.zeus.common.constants.UserGroupConstants;
-import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.dto.request.ProjectRequest;
 import cn.master.zeus.dto.request.QueryMemberRequest;
 import cn.master.zeus.entity.ProjectVersion;
 import cn.master.zeus.entity.UserGroup;
 import cn.master.zeus.mapper.ProjectVersionMapper;
 import cn.master.zeus.mapper.UserGroupMapper;
-import cn.master.zeus.service.BaseCheckPermissionService;
 import cn.master.zeus.service.SystemUserService;
 import cn.master.zeus.util.SessionUtils;
 import com.mybatisflex.core.paginate.Page;
@@ -97,7 +96,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private void saveProject(Project project) {
         val exists = queryChain().where(PROJECT.WORKSPACE_ID.eq(project.getWorkspaceId()).and(PROJECT.NAME.eq(project.getName()))).exists();
         if (exists) {
-            throw new ServiceException(PROJECT_NAME_DUPLICATE);
+            throw new BusinessException(PROJECT_NAME_DUPLICATE);
         }
         project.setSystemId(genSystemId());
         mapper.insert(project);

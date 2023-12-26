@@ -8,6 +8,16 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/zeus?characterEncoding=UTF-8&useInformationSchema=true
     username: root
     password: admin
+  data:
+    redis:
+      database: 1
+      host: 172.16.2.10
+      port: 6379
+      timeout: 5000
+      jedis:
+        pool:
+          max-active: 10
+      password: c1$4T&9pW#z2Q@7vL
 #  JWT Configuration
 security:
   jwt:

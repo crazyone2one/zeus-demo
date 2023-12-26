@@ -82,12 +82,11 @@ const menuOptions: MenuOption[] = [
             label: () => h(RouterLink, { to: { name: 'workspace' } }, { default: () => i18n.t('commons.workspace') }),
             key: 'workspace',
           },
-          // {
-          //   label: () =>
-          //     h(RouterLink, { to: { name: 'usergroup' } }, { default: () => i18n.t('group.group_permission') }),
-          //   key: 'group',
-          //   disabled: true,
-          // },
+          {
+            label: () =>
+              h(RouterLink, { to: { name: 'usergroup' } }, { default: () => i18n.t('group.group_permission') }),
+            key: 'group',
+          },
         ],
       },
       {

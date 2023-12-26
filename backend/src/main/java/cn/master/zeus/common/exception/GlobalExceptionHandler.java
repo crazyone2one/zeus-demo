@@ -27,21 +27,21 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({UsernameNotFoundException.class})
-    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
+    public CommonResult<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
         log.error("handle UsernameNotFoundException =>", e);
-        return ResponseEntity.ok(CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+        return CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
     }
 
     @ExceptionHandler({BadCredentialsException.class})
-    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e) {
+    public CommonResult<Object> handleBadCredentialsException(BadCredentialsException e) {
         log.error("handle BadCredentialsException =>", e);
-        return ResponseEntity.ok(CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+        return CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
     }
 
-    @ExceptionHandler({ServiceException.class})
-    public ResponseEntity<CommonResult<String>> handleServiceException(ServiceException e) {
+    @ExceptionHandler({BusinessException.class})
+    public CommonResult<String> handleServiceException(BusinessException e) {
         log.error("handle ServiceException =>", e);
-        return ResponseEntity.ok(CommonResult.error(e));
+        return CommonResult.error(e);
         //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 

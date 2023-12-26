@@ -1,5 +1,6 @@
 package cn.master.zeus.mapper;
 
+import cn.master.zeus.dto.GroupDTO;
 import com.mybatisflex.core.BaseMapper;
 import cn.master.zeus.entity.SystemGroup;
 
@@ -10,5 +11,5 @@ import cn.master.zeus.entity.SystemGroup;
  * @since 1.0.0
  */
 public interface SystemGroupMapper extends BaseMapper<SystemGroup> {
-
+    GroupDTO getGroupList();
 }

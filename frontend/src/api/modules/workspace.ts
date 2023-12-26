@@ -1,4 +1,3 @@
-import { SelectOption } from 'naive-ui'
 import { IPageResponse, IQueryParam } from '../interface'
 import alovaInstance from '/@/api/index'
 import { IUserDto } from './user'
@@ -34,13 +33,4 @@ const updateWs = (params: any) => {
   return alovaInstance.Put(`/workspace/${params.id}`, params)
 }
 export const switchWorkspace = (wsId: string) => alovaInstance.Get<IUserDto>(`/user/switch/source/ws/${wsId}`)
-const list2SelectOption = (val: Array<IWorkspaceItem>) => {
-  const result: SelectOption[] = []
-  val.forEach((item) => {
-    const option: SelectOption = {}
-    option.label = item.name
-    option.value = item.id
-    result.push(option)
-  })
-  return result
-}
+export const getWorkspaces = () => alovaInstance.Get<Array<IWorkspaceItem>>('/workspace/list')

@@ -2,14 +2,19 @@ package cn.master.zeus.service.impl;
 
 import cn.master.zeus.common.constants.SystemReference;
 import cn.master.zeus.common.constants.UserGroupConstants;
-import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.common.constants.UserGroupType;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.dto.RelatedSource;
+import cn.master.zeus.dto.WorkspaceResource;
 import cn.master.zeus.dto.request.BaseRequest;
 import cn.master.zeus.dto.request.QueryMemberRequest;
 import cn.master.zeus.dto.response.DetailColumn;
 import cn.master.zeus.dto.response.OperatingLogDetails;
+import cn.master.zeus.entity.Project;
+import cn.master.zeus.entity.SystemGroup;
 import cn.master.zeus.entity.UserGroup;
 import cn.master.zeus.entity.Workspace;
+import cn.master.zeus.mapper.ProjectMapper;
 import cn.master.zeus.mapper.UserGroupMapper;
 import cn.master.zeus.mapper.WorkspaceMapper;
 import cn.master.zeus.service.SystemUserService;
@@ -24,15 +29,17 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.WORKSPACE_NAME_DUPLICATE;
 import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
+import static cn.master.zeus.entity.table.SystemGroupTableDef.SYSTEM_GROUP;
 import static cn.master.zeus.entity.table.UserGroupTableDef.USER_GROUP;
 import static cn.master.zeus.entity.table.WorkspaceTableDef.WORKSPACE;
 
@@ -46,7 +53,9 @@ import static cn.master.zeus.entity.table.WorkspaceTableDef.WORKSPACE;
 @RequiredArgsConstructor
 public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace> implements WorkspaceService {
     final UserGroupMapper userGroupMapper;
+    final ProjectMapper projectMapper;
     final SystemUserService systemUserService;
+    private static final String GLOBAL = "global";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -117,6 +126,48 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         return queryChain().where(WORKSPACE.ID.in(wsIds)).list();
     }
 
+    @Override
+    public WorkspaceResource listResource(String groupCode, String type) {
+        SystemGroup group = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.GROUP_CODE.eq(groupCode)).one();
+        WorkspaceResource resource = new WorkspaceResource();
+        if (Objects.isNull(group)) {
+            return resource;
+        }
+        if (StringUtils.equals(UserGroupType.WORKSPACE, type)) {
+            resource.setWorkspaces(getWorkspaceGroupResource(group.getScopeId()));
+        }
+        if (StringUtils.equals(UserGroupType.PROJECT, type)) {
+            resource.setProjects(getProjectGroupResource(group.getScopeId()));
+        }
+        return resource;
+    }
+
+    @Override
+    public List<Workspace> getWorkspaceList(BaseRequest baseRequest) {
+        return queryChain().where(WORKSPACE.NAME.like(baseRequest.getName())).orderBy(WORKSPACE.UPDATE_TIME.desc()).list();
+    }
+
+    private List<Workspace> getWorkspaceGroupResource(String scopeId) {
+        QueryChain<Workspace> chain = queryChain().where(WORKSPACE.ID.eq(scopeId).when(!StringUtils.equals(scopeId, GLOBAL)));
+        return mapper.selectListByQuery(chain);
+    }
+
+    private List<Project> getProjectGroupResource(String scopeId) {
+        if (StringUtils.equals(scopeId, GLOBAL)) {
+            return projectMapper.selectAll();
+        }
+        Workspace workspace = mapper.selectOneById(scopeId);
+        if (Objects.nonNull(workspace)) {
+            return projectMapper.selectListByQuery(QueryChain.of(Project.class).where(PROJECT.WORKSPACE_ID.eq(scopeId)));
+        }
+        List<Project> list = new ArrayList<>();
+        Project project = projectMapper.selectOneById(scopeId);
+        if (Objects.nonNull(project)) {
+            list.add(project);
+        }
+        return list;
+    }
+
     private List<RelatedSource> getRelatedSource(String userId) {
         val queryChain = QueryChain.of(UserGroup.class).select(PROJECT.WORKSPACE_ID.as("workspaceId"), PROJECT.ID.as("projectId"))
                 .from(USER_GROUP)
@@ -136,7 +187,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         val count = QueryChain.of(Workspace.class).where(WORKSPACE.NAME.eq(workspace.getName())
                 .and(WORKSPACE.ID.ne(workspace.getId()))).count();
         if (count > 0) {
-            throw new ServiceException(WORKSPACE_NAME_DUPLICATE);
+            throw new BusinessException(WORKSPACE_NAME_DUPLICATE);
         }
     }
 }

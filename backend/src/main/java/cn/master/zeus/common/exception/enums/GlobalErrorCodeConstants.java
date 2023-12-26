@@ -23,4 +23,14 @@ public interface GlobalErrorCodeConstants {
     ErrorCode WORKSPACE_NAME_DUPLICATE = new ErrorCode(1002004000, "工作空间名已存在");
     ErrorCode PROJECT_NAME_DUPLICATE = new ErrorCode(200000, "项目名已存在");
     ErrorCode CHECK_OWNER_PROJECT = new ErrorCode(200001, "当前用户没有操作此项目的权限");
+
+    // ========== 用户模块 100200 ==========
+    ErrorCode USER_USERNAME_EXISTS = new ErrorCode(100200, "用户账号已经存在");
+    ErrorCode USER_MOBILE_EXISTS = new ErrorCode(100201, "手机号已经存在");
+    ErrorCode USER_EMAIL_EXISTS = new ErrorCode(100202, "邮箱已经存在");
+    ErrorCode USER_NOT_EXISTS = new ErrorCode(100203, "用户不存在");
+    // ========== 用户模块 100300 ==========
+    ErrorCode GROUP_NOT_EXISTS = new ErrorCode(100300, "group does not exist!");
+    ErrorCode GROUP_NOT_DELETE = new ErrorCode(100301, "系统用户组不支持删除!");
+    ErrorCode GROUP_NAME_DUPLICATE = new ErrorCode(100302, "用户组名称已存在");
 }

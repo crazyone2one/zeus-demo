@@ -1,5 +1,6 @@
 package cn.master.zeus.entity;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
@@ -47,11 +48,13 @@ public class SystemGroup implements Serializable {
     /**
      * Create timestamp
      */
+    @Column(onInsertValue = "now()")
     private LocalDateTime createTime;
 
     /**
      * Update timestamp
      */
+    @Column(onInsertValue = "now()",onUpdateValue = "now()")
     private LocalDateTime updateTime;
 
     /**

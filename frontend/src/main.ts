@@ -10,6 +10,8 @@ import 'vfonts/Lato.css'
 
 import pinia from './store'
 import i18n from './i18n'
+import permission from './directive/permission'
+import debounce from './directive/debounce'
 
 import 'virtual:uno.css'
 
@@ -18,4 +20,6 @@ app.use(router)
 app.use(naive)
 app.use(pinia)
 app.use(i18n)
+app.directive('permission', permission)
+app.directive('debounce', debounce)
 app.mount('#app')

@@ -49,7 +49,13 @@ const handleSearch = () => {
   <div>
     <n-space justify="space-between">
       <span class="operate-button">
-        <n-table-button v-if="showCreate" :content="createTip" icon="i-mdi:plus" @click="emits('create')" />
+        <n-table-button
+          v-if="showCreate"
+          v-permission="createPermission"
+          :content="createTip"
+          icon="i-mdi:plus"
+          @click="emits('create')"
+        />
         <n-table-button
           v-if="showImport"
           :content="importTip"

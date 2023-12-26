@@ -4,6 +4,7 @@ import GlobalFetch from 'alova/GlobalFetch'
 import { useAuthStore } from '../store/modules/auth-store'
 import { createServerTokenAuthentication } from '@alova/scene-vue'
 import { refreshUserToken } from './modules/auth'
+import { getCurrentProjectId, getCurrentWorkspaceId } from '../utils/token'
 
 // const logOnDev = (message: string) => {
 //   if (import.meta.env.MODE === 'development') {
@@ -18,6 +19,8 @@ const { onAuthRequired, onResponseRefreshToken } = createServerTokenAuthenticati
       const { accessToken } = useAuthStore()
       method.config.headers.Authorization = `Bearer ${accessToken}`
     }
+    method.config.headers.WORKSPACE = getCurrentWorkspaceId()
+    method.config.headers.PROJECT = getCurrentProjectId()
   },
   refreshTokenOnSuccess: {
     // 响应时触发，可获取到response和method，并返回boolean表示token是否过期
@@ -53,6 +56,7 @@ const alovaInstance = createAlova({
     // 请求成功的拦截器
     // 当使用GlobalFetch请求适配器时，第一个参数接收Response对象
     // 第二个参数为当前请求的method实例，你可以用它同步请求前后的配置信息
+    // TODO: 401重新登录系统
     if (response.status >= 400) {
       // window.$message.error('请求失败') // 弹出错误提示
       if (response.status === 500) {

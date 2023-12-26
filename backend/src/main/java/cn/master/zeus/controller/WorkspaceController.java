@@ -75,7 +75,7 @@ public class WorkspaceController {
      */
     @GetMapping("list")
     public List<Workspace> list() {
-        return workspaceService.list();
+        return workspaceService.getWorkspaceList(new BaseRequest());
     }
 
     @GetMapping("/list/user/workspace")

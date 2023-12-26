@@ -1,5 +1,6 @@
 package cn.master.zeus.entity;
 
+import cn.master.zeus.dto.UserGroupPermissionDTO;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -7,6 +8,7 @@ import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,11 +36,13 @@ public class SystemUser implements Serializable {
     /**
      * User name
      */
+    @NotEmpty(message = "用户名不能为空")
     private String name;
 
     /**
      * E-Mail address
      */
+    @NotEmpty(message = "邮箱不能为空")
     private String email;
 
     private String password;
@@ -80,5 +84,8 @@ public class SystemUser implements Serializable {
     private String seleniumServer;
 
     private Boolean delFlag;
+
+    @Column(ignore = true)
+    private UserGroupPermissionDTO userGroupPermissionDTO;
 
 }

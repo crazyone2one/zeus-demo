@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class ServiceException extends RuntimeException {
+public class BusinessException extends RuntimeException {
     private Integer code;
     private String message;
 
-    public ServiceException(ErrorCode errorCode) {
+    public BusinessException(ErrorCode errorCode) {
         this.code = errorCode.getCode();
         this.message = errorCode.getMsg();
     }
 
-    public ServiceException(Integer code, String message) {
+    public BusinessException(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

@@ -1,6 +1,6 @@
 package cn.master.zeus.auth;
 
-import cn.master.zeus.common.exception.ServiceException;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -68,11 +67,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             log.info("authenticated user with email/username :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (UnsupportedJwtException exception) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Unsupported JWT token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Unsupported JWT token");
         } catch (MalformedJwtException exception) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
         } catch (SecurityException exception) {
-            throw new ServiceException(HttpStatus.UNAUTHORIZED.value(), "Invalid format token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Invalid format token");
         } catch (JwtException e) {
             throw new JwtException(e.getMessage());
         }

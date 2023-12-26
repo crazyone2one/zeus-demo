@@ -30,3 +30,5 @@ export const queryProjectPage = (page: number, pageSize: number, params: IQueryP
 export const saveProject = (params: IProjectItem) => {
   return alovaInstance.Post<IProjectItem>('/project/save', params)
 }
+
+export const getProjectList = () => alovaInstance.Get<IProjectItem[]>('/project/list')

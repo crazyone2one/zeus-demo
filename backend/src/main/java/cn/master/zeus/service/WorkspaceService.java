@@ -1,5 +1,6 @@
 package cn.master.zeus.service;
 
+import cn.master.zeus.dto.WorkspaceResource;
 import cn.master.zeus.dto.request.BaseRequest;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
@@ -26,4 +27,8 @@ public interface WorkspaceService extends IService<Workspace> {
     String getLogDetails(String workspaceId);
 
     List<Workspace> getWorkspaceListByUserId(String userId);
+
+    WorkspaceResource listResource(String groupCode, String type);
+
+    List<Workspace> getWorkspaceList(BaseRequest baseRequest);
 }
