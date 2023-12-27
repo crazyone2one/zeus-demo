@@ -2,6 +2,7 @@
 import { usePagination } from '@alova/scene-vue'
 import { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import { onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import EditProject from './components/EditProject.vue'
 import { IQueryParam } from '/@/api/interface'
 import { IProjectItem, queryProjectPage } from '/@/api/modules/project'
@@ -15,6 +16,7 @@ const condition = reactive<IQueryParam>({
   pageNumber: 1,
   pageSize: 5,
 })
+const router = useRouter()
 const editProject = ref<InstanceType<typeof EditProject> | null>(null)
 const columns: DataTableColumns<IProjectItem> = [
   {
@@ -81,9 +83,17 @@ const handleList = () => {
 const handleCreate = () => {
   editProject.value?.open()
 }
+const route = useRoute()
 onMounted(() => {
   condition.workspaceId = getCurrentWorkspaceId()
   loadTableData()
+  const tmpPath = route.path.split('/')[2]
+  if (tmpPath === 'create') {
+    editProject.value?.open()
+    router.push('/project/all')
+  } else {
+    router.push('/project/all')
+  }
 })
 </script>
 

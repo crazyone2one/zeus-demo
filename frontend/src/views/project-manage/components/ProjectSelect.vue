@@ -2,7 +2,7 @@
 import { useRequest } from 'alova'
 import { SelectOption } from 'naive-ui'
 import { onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { IProjectItem, getUserProjectList, switchProject } from '/@/api/modules/project'
 import { i18n } from '/@/i18n'
 import { getCurrentProjectId, getCurrentUserId, getCurrentWorkspaceId } from '/@/utils/token'
@@ -10,6 +10,7 @@ interface IProp {
   projectName: string
 }
 const route = useRoute()
+const router = useRouter()
 const props = defineProps<IProp>()
 const currentProject = ref<string | undefined>(props.projectName)
 const currentProjectId = ref<string | undefined>('')
@@ -74,6 +75,9 @@ watch(
     console.log(`output->val`, val)
   },
 )
+const handleAddOrList = (val: boolean) => {
+  val ? router.push('/project/create') : router.push('/project/all')
+}
 onMounted(() => {
   init()
 })
@@ -100,7 +104,12 @@ onMounted(() => {
         <template #action>
           <div v-permission="['WORKSPACE_PROJECT_MANAGER:READ']">
             <n-space vertical>
-              <n-button v-permission="['WORKSPACE_PROJECT_MANAGER:READ+CREATE']" secondary size="tiny">
+              <n-button
+                v-permission="['WORKSPACE_PROJECT_MANAGER:READ+CREATE']"
+                secondary
+                size="tiny"
+                @click="handleAddOrList(true)"
+              >
                 <template #icon>
                   <n-icon>
                     <span class="i-mdi:plus" />
@@ -108,7 +117,12 @@ onMounted(() => {
                 </template>
                 {{ $t('project.create') }}
               </n-button>
-              <n-button v-permission="['WORKSPACE_PROJECT_MANAGER:READ']" secondary size="tiny">
+              <n-button
+                v-permission="['WORKSPACE_PROJECT_MANAGER:READ']"
+                secondary
+                size="tiny"
+                @click="handleAddOrList(false)"
+              >
                 <template #icon>
                   <n-icon>
                     <span class="i-mdi:format-list-numbered-rtl" />
