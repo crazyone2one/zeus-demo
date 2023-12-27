@@ -59,11 +59,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             log.info("authenticated user with email/username :{}", username);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (UnsupportedJwtException exception) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Unsupported JWT token");
+            BusinessException.throwException("Unsupported JWT token");
         } catch (MalformedJwtException exception) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
+            BusinessException.throwException("Invalid JWT token");
         } catch (SecurityException exception) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "Invalid format token");
+            BusinessException.throwException("Invalid format token");
         } catch (JwtException e) {
             throw new JwtException(e.getMessage());
         }
