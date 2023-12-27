@@ -1,26 +1,49 @@
 package cn.master.zeus.common.exception;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author Created by 11's papa on 12/12/2023
  **/
-@Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
 public class BusinessException extends RuntimeException {
-    private Integer code;
-    private String message;
+    private Object detail;
 
-    public BusinessException(ErrorCode errorCode) {
-        this.code = errorCode.getCode();
-        this.message = errorCode.getMsg();
+    private BusinessException(String message) {
+        super(message);
     }
 
-    public BusinessException(Integer code, String message) {
-        this.code = code;
-        this.message = message;
+    private BusinessException(String message, Object detail) {
+        super(message);
+        this.detail = detail;
     }
+
+    private BusinessException(Throwable cause) {
+        super(cause);
+    }
+
+    private BusinessException(Throwable cause, Object detail) {
+        super(cause);
+        this.detail = detail;
+    }
+
+    public static void throwException(String message) {
+        throw new BusinessException(message);
+    }
+
+    public static void throwException(String message, Object detail) {
+        throw new BusinessException(message, detail);
+    }
+
+    public static BusinessException getException(String message) {
+        throw new BusinessException(message);
+    }
+
+    public static void throwException(Throwable t) {
+        throw new BusinessException(t);
+    }
+
+    public static void throwException(Throwable t, Object detail) {
+        throw new BusinessException(t, detail);
+    }
+
 }

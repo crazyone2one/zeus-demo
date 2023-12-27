@@ -1,6 +1,6 @@
 package cn.master.zeus.controller;
 
-import cn.master.zeus.config.CommonResult;
+import cn.master.zeus.common.exception.BusinessException;
 import cn.master.zeus.dto.request.AuthenticationRequest;
 import cn.master.zeus.dto.request.RefreshTokenRequest;
 import cn.master.zeus.dto.response.AuthenticationResponse;
@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +34,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public CommonResult<String> logout(Principal principal) {
+    public String logout(Principal principal) {
         authenticationService.logout(principal.getName());
-        return CommonResult.success("User logged out successfully");
+        return "User logged out successfully";
     }
 
     @PostMapping("/refresh")

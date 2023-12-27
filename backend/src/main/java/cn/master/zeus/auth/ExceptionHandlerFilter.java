@@ -1,6 +1,6 @@
 package cn.master.zeus.auth;
 
-import cn.master.zeus.config.CommonResult;
+import cn.master.zeus.common.handler.ResultHolder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
@@ -25,14 +25,12 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (RuntimeException e) {
             // custom error response class
-            CommonResult<String> apiError = new CommonResult<>();
+            ResultHolder apiError = new ResultHolder();
             apiError.setMessage(e.getMessage());
-
             int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
             if (e instanceof JwtException) {
                 status = HttpStatus.UNAUTHORIZED.value();
             }
-            apiError.setCode(status);
             response.setStatus(status);
             response.getWriter().write(convertObjectToJson(apiError));
         }

@@ -1,19 +1,19 @@
-package cn.master.zeus.common.exception;
+package cn.master.zeus.common.handler;
 
-import cn.master.zeus.config.CommonResult;
+import cn.master.zeus.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Collections;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,22 +27,31 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({UsernameNotFoundException.class})
-    public CommonResult<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResultHolder handleUsernameNotFoundException(UsernameNotFoundException e) {
         log.error("handle UsernameNotFoundException =>", e);
-        return CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+        return ResultHolder.error(e.getMessage());
     }
 
     @ExceptionHandler({BadCredentialsException.class})
-    public CommonResult<Object> handleBadCredentialsException(BadCredentialsException e) {
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResultHolder handleBadCredentialsException(BadCredentialsException e) {
         log.error("handle BadCredentialsException =>", e);
-        return CommonResult.error(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+        return ResultHolder.error(e.getMessage());
     }
 
     @ExceptionHandler({BusinessException.class})
-    public CommonResult<String> handleServiceException(BusinessException e) {
-        log.error("handle ServiceException =>", e);
-        return CommonResult.error(e);
-        //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResultHolder handleServiceException(BusinessException e) {
+        log.error("handle BusinessException =>", e);
+        return ResultHolder.error(e.getMessage());
+    }
+
+    @ExceptionHandler({SQLException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResultHolder sqlExceptionHandler(SQLException e) {
+        log.error("handle SQLException =>", e);
+        return ResultHolder.error(e.getMessage());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -61,16 +70,10 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleException(Exception e) {
-        log.error("handle exception {}", e.getMessage());
-        List<String> errors = Collections.singletonList(e.getMessage());
-        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public final ResponseEntity<Map<String, List<String>>> handleRuntimeExceptions(RuntimeException ex) {
-        List<String> errors = Collections.singletonList(ex.getMessage());
-        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    //@ExceptionHandler({Exception.class})
+    //public ResponseEntity<Object> handleException(Exception e) {
+    //    log.error("handle exception {}", e.getMessage());
+    //    List<String> errors = Collections.singletonList(e.getMessage());
+    //    return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    //}
 }

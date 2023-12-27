@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.CHECK_OWNER_PROJECT;
 import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
 
 /**
@@ -23,7 +22,7 @@ public class BaseCheckPermissionServiceImpl  implements BaseCheckPermissionServi
         // 实现逻辑
         val project = QueryChain.of(Project.class).where(PROJECT.ID.eq(projectId)).one();
         if (Objects.isNull(project) || !StringUtils.equals(project.getWorkspaceId(), workspaceId)) {
-            throw new BusinessException(CHECK_OWNER_PROJECT);
+            BusinessException.throwException("当前用户没有操作此项目的权限");
         }
     }
 }
