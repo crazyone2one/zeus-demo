@@ -143,13 +143,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return permissionDTO;
         }
         permissionDTO.setUserGroups(userGroups);
-        List<String> groupList = userGroups.stream().map(UserGroup::getGroupCode).toList();
-        val groups = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.GROUP_CODE.in(groupList)).list();
+        List<String> groupList = userGroups.stream().map(UserGroup::getGroupId).toList();
+        val groups = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.ID.in(groupList)).list();
         permissionDTO.setGroups(groups);
         for (SystemGroup gp : groups) {
             GroupResourceDTO dto = new GroupResourceDTO();
             dto.setGroup(gp);
-            val userGroupPermissions = QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_CODE.eq(gp.getGroupCode())).list();
+            val userGroupPermissions = QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_ID.eq(gp.getId())).list();
             dto.setUserGroupPermissions(userGroupPermissions);
             list.add(dto);
         }

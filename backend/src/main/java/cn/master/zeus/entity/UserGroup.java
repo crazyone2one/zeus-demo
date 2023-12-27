@@ -28,7 +28,7 @@ public class UserGroup implements Serializable {
 
     private String userId;
 
-    private String groupCode;
+    private String groupId;
 
     private String sourceId;
 

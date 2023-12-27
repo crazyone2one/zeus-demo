@@ -11,6 +11,6 @@ import org.apache.ibatis.annotations.Select;
  * @since 1.0.0
  */
 public interface UserGroupMapper extends BaseMapper<UserGroup> {
-    @Select("select count(*) from user_group where user_id = #{userId} and group_code = 'super_group'")
+    @Select("select count(*) from user_group where user_id = #{userId} and group_id = 'super_group'")
     boolean isSuperUser(String userId);
 }

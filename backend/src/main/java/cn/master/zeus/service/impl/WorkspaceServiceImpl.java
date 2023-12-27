@@ -65,7 +65,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         mapper.insert(workspace);
 
         val userGroup = UserGroup.builder().userId(userId).sourceId(workspace.getId())
-                .groupCode(UserGroupConstants.WS_ADMIN).build();
+                .groupId(UserGroupConstants.WS_ADMIN).build();
         userGroupMapper.insert(userGroup);
         return workspace;
     }
@@ -127,7 +127,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
 
     @Override
     public WorkspaceResource listResource(String groupCode, String type) {
-        SystemGroup group = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.GROUP_CODE.eq(groupCode)).one();
+        SystemGroup group = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.ID.eq(groupCode)).one();
         WorkspaceResource resource = new WorkspaceResource();
         if (Objects.isNull(group)) {
             return resource;

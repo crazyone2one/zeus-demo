@@ -63,15 +63,15 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
     public List<Map<String, Object>> getAllUserGroup(String userId) {
         List<Map<String, Object>> list = new ArrayList<>();
         List<UserGroup> userGroups = QueryChain.of(UserGroup.class).where(USER_GROUP.USER_ID.eq(userId)).list();
-        List<String> groupCodes = userGroups.stream().map(UserGroup::getGroupCode).distinct().toList();
+        List<String> groupCodes = userGroups.stream().map(UserGroup::getGroupId).distinct().toList();
         groupCodes.forEach(gc -> {
-            SystemGroup group = queryChain().where(SYSTEM_GROUP.GROUP_CODE.eq(gc)).one();
+            SystemGroup group = queryChain().where(SYSTEM_GROUP.ID.eq(gc)).one();
             String type = group.getType();
             Map<String, Object> map = new HashMap<>(2);
             map.put("type", gc + "+" + type);
             WorkspaceResource workspaceResource = workspaceService.listResource(gc, group.getType());
             //List<String> collect = userGroups.stream().map(UserGroup::getGroupCode).filter(groupCode -> groupCode.equals(gc)).toList();
-            List<String> collect = userGroups.stream().filter(ugp -> ugp.getGroupCode().equals(gc)).map(UserGroup::getSourceId).toList();
+            List<String> collect = userGroups.stream().filter(ugp -> ugp.getGroupId().equals(gc)).map(UserGroup::getSourceId).toList();
             map.put("ids", collect);
             if (StringUtils.equals(type, UserGroupType.WORKSPACE)) {
                 map.put("workspaces", workspaceResource.getWorkspaces());
@@ -112,8 +112,8 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
             BusinessException.throwException("系统用户组不支持删除");
         }
         mapper.deleteById(id);
-        userGroupMapper.deleteByQuery(QueryChain.of(UserGroup.class).where(USER_GROUP.GROUP_CODE.eq(group.getGroupCode())));
-        userGroupPermissionMapper.deleteByQuery(QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_CODE.eq(group.getGroupCode())));
+        userGroupMapper.deleteByQuery(QueryChain.of(UserGroup.class).where(USER_GROUP.GROUP_ID.eq(id)));
+        userGroupPermissionMapper.deleteByQuery(QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_ID.eq(id)));
         return false;
     }
 
@@ -131,7 +131,7 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
     @Override
     public GroupPermissionDTO getGroupResource(SystemGroup group) {
         GroupPermissionDTO dto = new GroupPermissionDTO();
-        List<UserGroupPermission> groupPermissions = QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_CODE.eq(group.getGroupCode())).list();
+        List<UserGroupPermission> groupPermissions = QueryChain.of(UserGroupPermission.class).where(USER_GROUP_PERMISSION.GROUP_ID.eq(group.getId())).list();
         List<String> groupPermissionIds = groupPermissions.stream().map(UserGroupPermission::getPermissionId).toList();
         GroupJson groupJson = loadPermissionJsonFromService();
         List<GroupResourceDTO> dtoPermissions = dto.getPermissions();
@@ -152,13 +152,13 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
             return;
         }
         userGroupPermissionMapper.deleteByQuery(QueryChain.of(UserGroupPermission.class)
-                .where(USER_GROUP_PERMISSION.GROUP_CODE.eq(request.getUserGroupId())));
+                .where(USER_GROUP_PERMISSION.GROUP_ID.eq(request.getUserGroupId())));
         String groupId = request.getUserGroupId();
         permissions.forEach(permission -> {
             if (BooleanUtils.isTrue(permission.getChecked())) {
                 String permissionId = permission.getId();
                 String resourceId = permission.getResourceId();
-                UserGroupPermission build = UserGroupPermission.builder().permissionId(permissionId).groupCode(groupId).moduleId(resourceId).build();
+                UserGroupPermission build = UserGroupPermission.builder().permissionId(permissionId).groupId(groupId).moduleId(resourceId).build();
                 userGroupPermissionMapper.insert(build);
             }
         });
@@ -274,7 +274,7 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
         if (CollectionUtils.isNotEmpty(records)) {
             records.forEach(groupDTO -> {
                         List<UserGroup> userGroups = QueryChain.of(UserGroup.class).select(distinct(USER_GROUP.USER_ID))
-                                .where(USER_GROUP.GROUP_CODE.eq(groupDTO.getGroupCode())).list();
+                                .where(USER_GROUP.GROUP_ID.eq(groupDTO.getId())).list();
                         groupDTO.setMemberSize(userGroups.size());
                     }
             );
@@ -283,8 +283,8 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
     }
 
     private List<UserGroupDTO> getUserGroupDTO(String userId, String projectId) {
-        QueryChain<SystemGroup> queryChain = queryChain().select(USER_GROUP.USER_ID, USER_GROUP.GROUP_CODE, USER_GROUP.SOURCE_ID, SYSTEM_GROUP.NAME, SYSTEM_GROUP.TYPE.as("type"))
-                .from(USER_GROUP).join(SYSTEM_GROUP).on(USER_GROUP.GROUP_CODE.eq(SYSTEM_GROUP.GROUP_CODE))
+        QueryChain<SystemGroup> queryChain = queryChain().select(USER_GROUP.USER_ID, USER_GROUP.GROUP_ID, USER_GROUP.SOURCE_ID, SYSTEM_GROUP.NAME, SYSTEM_GROUP.TYPE.as("type"))
+                .from(USER_GROUP).join(SYSTEM_GROUP).on(USER_GROUP.GROUP_ID.eq(SYSTEM_GROUP.ID))
                 .where(USER_GROUP.USER_ID.eq(userId).and(USER_GROUP.SOURCE_ID.eq(projectId)));
         return mapper.selectListByQueryAs(queryChain, UserGroupDTO.class);
     }

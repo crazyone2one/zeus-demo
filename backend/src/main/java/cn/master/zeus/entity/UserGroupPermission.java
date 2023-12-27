@@ -27,7 +27,7 @@ public class UserGroupPermission implements Serializable {
     /**
      * 用户组ID
      */
-    private String groupCode;
+    private String groupId;
 
     private String permissionId;
 

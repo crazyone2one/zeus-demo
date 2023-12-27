@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { IUserDto } from '/@/api/modules/user'
 import { ref } from 'vue'
+import { IUserDto } from '/@/api/modules/user'
 
 // You can name the return value of `defineStore()` anything you want,
 // but it's best to use the name of the store and surround it with `use`
@@ -14,7 +14,7 @@ export const useUserStore = defineStore(
       // 校验权限
       user.userGroups?.forEach((ug) => {
         user.groupPermissions?.forEach((gp) => {
-          if (gp.group.groupCode === ug.group_code) {
+          if (gp.group.id === ug.groupId) {
             ug.userGroupPermissions = gp.userGroupPermissions
             ug.group = gp.group
           }
@@ -41,6 +41,7 @@ export const useUserStore = defineStore(
       sessionStorage.removeItem('workspace_id')
       sessionStorage.removeItem('project_id')
       sessionStorage.removeItem('workspace_name')
+      sessionStorage.removeItem('project_name')
     }
     const initUser = () => {
       user.value = {} as IUserDto

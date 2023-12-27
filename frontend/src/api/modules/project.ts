@@ -34,7 +34,7 @@ export const saveProject = (params: IProjectItem) => {
 
 export const getProjectList = () => alovaInstance.Get<IProjectItem[]>('/project/list')
 export const getUserProjectList = (param: { userId: string; workspaceId: string }) =>
-  alovaInstance.Post<Array<IProjectItem>>(`/project//list/related`, param)
+  alovaInstance.Post<Array<IProjectItem>>(`/project/list/related`, param)
 
 export const switchProject = (param: { id: string; lastProjectId: string }) =>
   alovaInstance.Post<IUserDto>(`/user/update/current`, param)

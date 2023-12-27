@@ -150,8 +150,8 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
             return userGroupPermissionDTO;
         }
         userGroupPermissionDTO.setUserGroups(userGroups);
-        List<String> groupCode = userGroups.stream().map(UserGroup::getGroupCode).toList();
-        List<SystemGroup> groups = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.GROUP_CODE.in(groupCode)).list();
+        List<String> groupCode = userGroups.stream().map(UserGroup::getGroupId).toList();
+        List<SystemGroup> groups = QueryChain.of(SystemGroup.class).where(SYSTEM_GROUP.ID.in(groupCode)).list();
         userGroupPermissionDTO.setGroups(groups);
         return userGroupPermissionDTO;
     }
@@ -262,7 +262,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
                 // 系统用户组
                 UserGroup userGroup = new UserGroup();
                 userGroup.setUserId(userId);
-                userGroup.setGroupCode(groupId);
+                userGroup.setGroupId(groupId);
                 userGroup.setSourceId("system");
                 userGroupMapper.insert(userGroup);
             } else {
@@ -271,7 +271,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
                 ids.forEach(id -> {
                     UserGroup userGroup = new UserGroup();
                     userGroup.setUserId(userId);
-                    userGroup.setGroupCode(groupId);
+                    userGroup.setGroupId(groupId);
                     userGroup.setSourceId(id);
                     userGroupMapper.insert(userGroup);
                 });

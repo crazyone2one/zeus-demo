@@ -55,7 +55,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         // 创建项目为当前用户添加用户组
         val userGroup = UserGroup.builder()
                 .userId(SessionUtils.getUserId())
-                .groupCode(UserGroupConstants.PROJECT_ADMIN)
+                .groupId(UserGroupConstants.PROJECT_ADMIN)
                 .sourceId(project.getId())
                 .build();
         userGroupMapper.insert(userGroup);
@@ -111,7 +111,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
         return queryChain().select(distinct(PROJECT.ALL_COLUMNS))
                 .from(SYSTEM_GROUP)
-                .join(USER_GROUP).on(USER_GROUP.GROUP_CODE.eq(SYSTEM_GROUP.GROUP_CODE))
+                .join(USER_GROUP).on(USER_GROUP.GROUP_ID.eq(SYSTEM_GROUP.ID))
                 .join(PROJECT).on(PROJECT.ID.eq(USER_GROUP.SOURCE_ID))
                 .where(SYSTEM_GROUP.TYPE.eq("PROJECT").and(USER_GROUP.USER_ID.eq(request.getUserId()))
                         .and(PROJECT.WORKSPACE_ID.eq(request.getWorkspaceId()))

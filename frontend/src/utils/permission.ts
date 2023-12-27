@@ -5,13 +5,13 @@ export const hasPermission = (permission: string): boolean => {
   if (!user || !user.groups) {
     return false
   }
-  const index = user.groups.findIndex((g) => g.groupCode === 'super_group')
+  const index = user.groups.findIndex((g) => g.id === 'super_group')
   if (index !== -1) {
     return true
   }
   user.userGroups?.forEach((ug) => {
     user.groupPermissions?.forEach((gp) => {
-      if (gp.group.groupCode === ug.groupCode) {
+      if (gp.group.id === ug.groupId) {
         ug.userGroupPermissions = gp.userGroupPermissions
         ug.group = gp.group
       }

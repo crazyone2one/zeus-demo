@@ -7,7 +7,7 @@ import alovaInstance from '/@/api/index'
 export interface IUserGroup {
   id: string
   userId: string
-  groupCode: string
+  groupId: string
   sourceId: string
   userGroupPermissions?: Array<IUserGroupPermission>
   group?: IGroup
@@ -18,7 +18,6 @@ export interface IGroup {
   description: string
   system: boolean
   type: string
-  groupCode: string
   scopeId: string
   global: boolean
   selects?: Array<string> // 选择项
@@ -41,7 +40,7 @@ export interface IGroupPermission {
 }
 export interface IUserGroupPermission {
   id: string
-  groupCode: string
+  groupId: string
   permissionId: string
   moduleId: string
 }

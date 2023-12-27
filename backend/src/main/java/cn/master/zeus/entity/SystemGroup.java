@@ -31,7 +31,7 @@ public class SystemGroup implements Serializable {
     /**
      * group code
      */
-    private String groupCode;
+    //private String groupCode;
 
     private String description;
 

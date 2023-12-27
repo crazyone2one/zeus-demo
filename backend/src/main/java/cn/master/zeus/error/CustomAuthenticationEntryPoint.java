@@ -1,5 +1,6 @@
 package cn.master.zeus.error;
 
+import cn.master.zeus.common.handler.ResultHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -27,9 +27,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED);
+        ResultHolder apiError = new ResultHolder();
         apiError.setMessage(e.getMessage());
-        apiError.setDebugMessage(e.getMessage());
 
         ServerHttpResponse outputMessage = new ServletServerHttpResponse(response);
         outputMessage.setStatusCode(HttpStatus.UNAUTHORIZED);
