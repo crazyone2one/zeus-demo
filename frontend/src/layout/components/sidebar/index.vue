@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { NLayoutSider, MenuOption, NMenu, NIcon } from 'naive-ui'
-import { h, ref } from 'vue'
+import { MenuOption, NIcon, NLayoutSider, NMenu } from 'naive-ui'
+import { h, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { i18n } from '/@/i18n'
-import { RouterLink } from 'vue-router'
 const collapsed = ref(false)
 const activeKey = ref<string | null>(null)
 // 菜单数据
@@ -54,8 +54,7 @@ const menuOptions: MenuOption[] = [
   {
     // label: i18n.t("commons.project_setting"),
     label: () => h(RouterLink, { to: { path: '/project' } }, { default: () => i18n.t('commons.project_setting') }),
-    key: 'project-setting',
-    disabled: true,
+    key: '/project/home',
     icon: () =>
       h(NIcon, null, {
         default: () => h('span', { class: 'i-mdi:folder-cog-outline' }),
@@ -76,16 +75,16 @@ const menuOptions: MenuOption[] = [
         children: [
           {
             label: () => h(RouterLink, { to: { name: 'user' } }, { default: () => i18n.t('commons.user') }),
-            key: 'user',
+            key: '/setting/user',
           },
           {
             label: () => h(RouterLink, { to: { name: 'workspace' } }, { default: () => i18n.t('commons.workspace') }),
-            key: 'workspace',
+            key: '/setting/workspace',
           },
           {
             label: () =>
               h(RouterLink, { to: { name: 'usergroup' } }, { default: () => i18n.t('group.group_permission') }),
-            key: 'group',
+            key: '/setting/usergroup',
           },
         ],
       },
@@ -95,8 +94,18 @@ const menuOptions: MenuOption[] = [
         key: 'people',
         children: [
           {
-            label: () => h(RouterLink, { to: { path: '/project/all' } }, { default: () => i18n.t('project.manager') }),
-            key: 'project',
+            label: () =>
+              h(
+                RouterLink,
+                {
+                  to: {
+                    name: 'project',
+                    params: { type: 'all' },
+                  },
+                },
+                { default: () => i18n.t('project.manager') },
+              ),
+            key: '/setting/project/all',
           },
         ],
       },
@@ -114,6 +123,14 @@ const menuOptions: MenuOption[] = [
     ],
   },
 ]
+const route = useRoute()
+watch(
+  () => route.path,
+  (newPath) => {
+    activeKey.value = newPath
+  },
+  { immediate: true },
+)
 </script>
 <template>
   <n-layout-sider

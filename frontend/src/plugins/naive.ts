@@ -1,8 +1,7 @@
 import {
-  // create naive ui
-  create,
   // component
   NButton,
+  NCard,
   NCheckbox,
   NCheckboxGroup,
   NDataTable,
@@ -13,14 +12,16 @@ import {
   NIcon,
   NInput,
   NPopover,
+  NPopselect,
+  NResult,
   NSelect,
   NSkeleton,
   NSpace,
   NSpin,
   NSwitch,
   NTooltip,
-  NResult,
-  NCard,
+  // create naive ui
+  create,
 } from 'naive-ui'
 
 const naive = create({
@@ -44,6 +45,7 @@ const naive = create({
     NResult,
     NFormItemRow,
     NCard,
+    NPopselect,
   ],
 })
 

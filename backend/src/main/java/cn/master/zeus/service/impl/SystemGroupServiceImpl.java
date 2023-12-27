@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
 import static cn.master.zeus.entity.table.SystemGroupTableDef.SYSTEM_GROUP;
 import static cn.master.zeus.entity.table.UserGroupPermissionTableDef.USER_GROUP_PERMISSION;
@@ -107,10 +106,10 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
     public boolean deleteGroup(Serializable id) {
         SystemGroup group = mapper.selectOneById(id);
         if (Objects.isNull(group)) {
-            throw new BusinessException(GROUP_NOT_EXISTS);
+           BusinessException.throwException("group does not exist!");
         }
         if (group.getSystem()) {
-            throw new BusinessException(GROUP_NOT_DELETE);
+            BusinessException.throwException("系统用户组不支持删除");
         }
         mapper.deleteById(id);
         userGroupMapper.deleteByQuery(QueryChain.of(UserGroup.class).where(USER_GROUP.GROUP_CODE.eq(group.getGroupCode())));
@@ -220,7 +219,7 @@ public class SystemGroupServiceImpl extends ServiceImpl<SystemGroupMapper, Syste
     private void checkGroupExist(EditGroupRequest request) {
         boolean exists = queryChain().where(SYSTEM_GROUP.NAME.eq(request.getName()).and(SYSTEM_GROUP.ID.ne(request.getId()))).exists();
         if (exists) {
-            throw new BusinessException(GROUP_NAME_DUPLICATE);
+            BusinessException.throwException("用户组名称已存在");
         }
     }
 

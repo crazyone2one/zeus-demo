@@ -138,4 +138,9 @@ public class SystemUserController {
     public UserGroupPermissionDTO getUserGroup(@PathVariable String userId) {
         return systemUserService.getUserGroup(userId);
     }
+
+    @PostMapping("/update/current")
+    public UserDTO updateCurrentUser(@RequestBody SystemUser user) {
+        return systemUserService.updateCurrentUser(user);
+    }
 }

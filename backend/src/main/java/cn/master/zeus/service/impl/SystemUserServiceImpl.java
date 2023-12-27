@@ -16,6 +16,7 @@ import cn.master.zeus.mapper.SystemUserMapper;
 import cn.master.zeus.mapper.UserGroupMapper;
 import cn.master.zeus.service.AuthenticationService;
 import cn.master.zeus.service.SystemUserService;
+import cn.master.zeus.util.SessionUtils;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -32,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.USER_EMAIL_EXISTS;
-import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.USER_USERNAME_EXISTS;
 import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
 import static cn.master.zeus.entity.table.SystemGroupTableDef.SYSTEM_GROUP;
 import static cn.master.zeus.entity.table.SystemUserTableDef.SYSTEM_USER;
@@ -123,11 +122,11 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
     public UserDTO insert(cn.master.zeus.dto.request.member.UserRequest systemUser) {
         val nameExist = queryChain().where(SYSTEM_USER.NAME.eq(systemUser.getName())).exists();
         if (nameExist) {
-            throw new BusinessException(USER_USERNAME_EXISTS);
+            BusinessException.throwException("该名称已经存在");
         } else {
             val exists = queryChain().where(SYSTEM_USER.EMAIL.eq(systemUser.getEmail())).exists();
             if (exists) {
-                throw new BusinessException(USER_EMAIL_EXISTS);
+                BusinessException.throwException("用户邮箱已存在");
             } else {
                 val user = UserConvert.INSTANCE.convert(systemUser);
                 user.setStatus(true);
@@ -140,6 +139,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
                 return authenticationService.getUserInfo(user.getId());
             }
         }
+        return null;
     }
 
     @Override
@@ -175,7 +175,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         }
         long count = queryChain().where(SYSTEM_USER.EMAIL.eq(user.getEmail()).and(SYSTEM_USER.ID.ne(user.getId()))).count();
         if (count > 0) {
-            throw new BusinessException(USER_EMAIL_EXISTS);
+            BusinessException.throwException("用户邮箱已存在");
         }
         mapper.update(user);
         return user.getId();
@@ -187,7 +187,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         if (StringUtils.isNotBlank(user.getEmail())) {
             long count = queryChain().where(SYSTEM_USER.EMAIL.eq(user.getEmail()).and(SYSTEM_USER.ID.ne(user.getId()))).count();
             if (count > 0) {
-                throw new BusinessException(USER_EMAIL_EXISTS);
+                BusinessException.throwException("email_already_exists");
             }
         }
         user.setPassword(null);
@@ -215,6 +215,41 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         String newPassword = request.getNewPassword();
         systemUser.setPassword(passwordEncoder.encode(newPassword));
         return mapper.update(systemUser);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public UserDTO updateCurrentUser(SystemUser user) {
+        String currentUserId = SessionUtils.getUserId();
+        if (!StringUtils.equals(currentUserId, user.getId())) {
+            BusinessException.throwException("not_authorized");
+        }
+        updateUser(user);
+        return authenticationService.getUserInfo(user.getId());
+    }
+
+    private void updateUser(SystemUser user) {
+        if (StringUtils.isNoneBlank(user.getEmail())) {
+            long count = queryChain().where(SYSTEM_USER.EMAIL.eq(user.getEmail()).and(SYSTEM_USER.ID.ne(user.getId()))).count();
+            if (count > 0) {
+                BusinessException.throwException("email_already_exists");
+            }
+        }
+        user.setPassword(null);
+        SystemUser userFromDb = mapper.selectOneById(user.getId());
+        if (user.getLastWorkspaceId() != null && !StringUtils.equals(user.getLastWorkspaceId(), userFromDb.getLastWorkspaceId())) {
+            List<Project> projects = getProjectListByWsAndUserId(user.getId(), user.getLastWorkspaceId());
+            if (CollectionUtils.isNotEmpty(projects)) {
+                // 如果传入的 last_project_id 是 last_workspace_id 下面的
+                boolean present = projects.stream().anyMatch(p -> StringUtils.equals(p.getId(), user.getLastProjectId()));
+                if (!present) {
+                    user.setLastProjectId(projects.get(0).getId());
+                }
+            } else {
+                user.setLastProjectId(StringUtils.EMPTY);
+            }
+        }
+        mapper.update(user);
     }
 
     private void insertUserGroup(List<Map<String, Object>> groups, String userId) {

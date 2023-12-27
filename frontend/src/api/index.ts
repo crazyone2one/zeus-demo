@@ -58,12 +58,12 @@ const alovaInstance = createAlova({
     // 第二个参数为当前请求的method实例，你可以用它同步请求前后的配置信息
     // TODO: 401重新登录系统
     if (response.status >= 400) {
-      if (response.status === 403) {
-        window.$message.error('Access Denied') // 弹出错误提示
-      }
-      if (response.status === 500) {
-        throw new Error('系统异常')
-      }
+      // if (response.status === 403) {
+      //   throw new Error(response.statusText) // 弹出错误提示
+      // }
+      // if (response.status === 500) {
+      //   throw new Error('系统异常')
+      // }
       throw new Error(response.statusText)
     }
     const json = await response.json()

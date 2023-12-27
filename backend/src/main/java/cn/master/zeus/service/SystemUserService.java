@@ -35,4 +35,6 @@ public interface SystemUserService extends IService<SystemUser> {
     String updateStatus(SystemUser systemUser);
 
     int updateUserPassword(EditPasswordRequest request);
+
+    UserDTO updateCurrentUser(SystemUser user);
 }

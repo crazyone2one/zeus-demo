@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
-import NTableHeader from '/@/components/NTableHeader.vue'
-import { IQueryParam } from '/@/api/interface'
-import { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import { IWorkspaceItem, queryWsPage } from '/@/api/modules/workspace'
-import { i18n } from '/@/i18n'
 import { usePagination } from '@alova/scene-vue'
-import NPagination from '/@/components/NPagination.vue'
+import { DataTableColumns, DataTableRowKey } from 'naive-ui'
+import { onMounted, reactive, ref } from 'vue'
 import EditWorkspace from './components/EditWorkspace.vue'
+import { IQueryParam } from '/@/api/interface'
+import { IWorkspaceItem, queryWsPage } from '/@/api/modules/workspace'
+import NPagination from '/@/components/NPagination.vue'
+import NTableHeader from '/@/components/NTableHeader.vue'
+import { i18n } from '/@/i18n'
 
 const condition = reactive<IQueryParam>({
   name: '',
@@ -91,6 +91,7 @@ onMounted(() => {
         <n-table-header
           :condition="condition"
           :create-tip="$t('workspace.create')"
+          :create-permission="['SYSTEM_WORKSPACE:READ+CREATE']"
           @search="handleList"
           @create="handleCreate"
         />

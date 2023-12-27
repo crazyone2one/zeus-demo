@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static cn.master.zeus.common.exception.enums.GlobalErrorCodeConstants.WORKSPACE_NAME_DUPLICATE;
 import static cn.master.zeus.entity.table.ProjectTableDef.PROJECT;
 import static cn.master.zeus.entity.table.SystemGroupTableDef.SYSTEM_GROUP;
 import static cn.master.zeus.entity.table.UserGroupTableDef.USER_GROUP;
@@ -187,7 +186,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
         val count = QueryChain.of(Workspace.class).where(WORKSPACE.NAME.eq(workspace.getName())
                 .and(WORKSPACE.ID.ne(workspace.getId()))).count();
         if (count > 0) {
-            throw new BusinessException(WORKSPACE_NAME_DUPLICATE);
+            BusinessException.throwException("工作空间名已存在");
         }
     }
 }
